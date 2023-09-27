@@ -1,0 +1,43 @@
+{
+  "name": "fanta-monitor-report",
+  "version": "0.0.1",
+  "description": "fanta is a frontend monitor report sdk",
+  "main": "dist/bundle.js",
+  "module": "dist/bundle.es.js",
+  "umd": "dist/bundle.umd.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "NODE_ENV='production' rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lion1ou/fanta-monitor-report.git"
+  },
+  "keywords": [
+    "frontend",
+    "monitor",
+    "report",
+    "前端",
+    "监控",
+    "上报"
+  ],
+  "author": "lion1ou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lion1ou/fanta-monitor-report/issues"
+  },
+  "homepage": "https://github.com/lion1ou/fanta-monitor-report#readme",
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.22.15",
+    "@babel/preset-env": "^7.22.20",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^25.0.4",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.1",
+    "@rollup/plugin-terser": "^0.4.3",
+    "rollup": "^3.29.3",
+    "rollup-plugin-typescript2": "^0.35.0",
+    "typescript": "^5.2.2"
+  }
+}
