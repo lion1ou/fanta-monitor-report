@@ -1,0 +1,9 @@
+{
+  "include": ["src/**/*.ts", "./.eslintrc.js"],
+  "exclude": ["node_modules", "**/*.spec.ts"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true
+  }
+}

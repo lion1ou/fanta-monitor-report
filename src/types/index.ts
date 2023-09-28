@@ -1,13 +1,13 @@
-interface InitParams{
-  appName: string;
-  reportUrl: string;
-  appVersion?: string;
-  ipUrl?: string;
-  debug?: boolean;
-  userId?: string;
-  [string: string]: any;
+interface InitParams {
+  [Z: string]: any
+  appName: string
+  reportUrl: string
+  appVersion?: string
+  ipUrl?: string
+  debug?: boolean
+  userId?: string
 }
 
-export {
+export type {
   InitParams
 }
