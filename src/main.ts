@@ -1,7 +1,7 @@
-import { getApp } from './baseData/device'
+import device from './baseData/device'
 import {InitParams} from './types/index'
 
-console.log(getApp())
+console.log(device)
 const initReport = (params: InitParams) => {
   console.log('initReport')
 
