@@ -1,14 +1,12 @@
-import { getApp } from './h5/h5BaseInfo/device'
+import device from './h5/h5BaseInfo/device'
 import { type InitParams } from './types/index'
 import log from './utils/log'
 import { getIp } from './utils/'
 
-const a = getApp()
-log.info(a)
-
 const initReport = async (params?: InitParams) => {
+  log.info('device', device)
   const res = await getIp()
-  console.log('initReport', res)
+  log.info('initReport', res)
 }
 
 initReport().catch((error) => {
