@@ -1,5 +1,4 @@
-import path from "path";
-
+// rollup 配置文件
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import rollupTypescript from "rollup-plugin-typescript2";
@@ -25,6 +24,11 @@ const config = {
     {
       file: pkg.umd,
       format: "umd",
+      name,
+    },
+    {
+      file: 'dist/bundle.iife.js',
+      format: "iife",
       name,
     },
   ],
