@@ -1,6 +1,8 @@
-/* eslint-disable no-useless-escape */
 // 获取系统信息
-const getOS = () => {
+export const getOS = (): {
+  os: string
+  osVersion: string
+} => {
   const ua = window.navigator.userAgent
   let os = ''
   let osVersion = ''
@@ -30,7 +32,10 @@ const getOS = () => {
     { s: 'UNIX', r: /UNIX/ },
     { s: 'BeOS', r: /BeOS/ },
     { s: 'OS/2', r: /OS\/2/ },
-    { s: 'Search Bot', r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/ },
+    {
+      s: 'Search Bot',
+      r: /(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/
+    },
     { s: 'HarmonyOS', r: /HarmonyOS/ }
   ]
   for (const iterator of osArr) {
@@ -71,7 +76,10 @@ const getOS = () => {
   }
 }
 // 获取浏览器信息
-const getBrower = () => {
+export const getBrower = (): {
+  browser: string
+  browserVersion: string
+} => {
   const ua = window.navigator.userAgent
   let browser = ''
   let browserVersion = ''
@@ -127,7 +135,7 @@ const getBrower = () => {
     browser = ua.substring(nameOffset, verOffset)
     browserVersion = ua.substring(verOffset + 1)
   }
-
+  // 阿里环境判断
   const alipayMatches = ua.match(/\s*AlipayClient\/([\d\.]+)/i)
   if (alipayMatches) {
     if (ua.includes('DingTalk')) {
@@ -141,7 +149,7 @@ const getBrower = () => {
     }
     browserVersion = alipayMatches[1] || '0.0.0'
   }
-
+  // 微信环境判断
   const wechatMatches = ua.match(/\s*MicroMessenger\/([\d\.]+)/i)
   if (wechatMatches) {
     if (ua.includes('wechatdevtools')) {
@@ -154,7 +162,7 @@ const getBrower = () => {
 
     browserVersion = wechatMatches[1] || '0.0.0'
   }
-
+  // utools 环境判断
   const utoolsMatches = ua.match(/\s*uTools\/([\d\.]+)/i)
   if (utoolsMatches) {
     browser = 'uTools'
@@ -166,11 +174,3 @@ const getBrower = () => {
     browserVersion
   }
 }
-
-const device = {
-  userAgent: window.navigator.userAgent,
-  ...getOS(),
-  ...getBrower()
-}
-
-export default device

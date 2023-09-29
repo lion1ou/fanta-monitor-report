@@ -1,7 +1,4 @@
-// declare let wx: any
-// declare let dd: any
-// declare let navigator: any
-
+// 获取网络类型
 // function getNetSpeed (url: string, times: number): number {
 //   return new Promise((resolve, reject) => {
 //     // downlink测算网速

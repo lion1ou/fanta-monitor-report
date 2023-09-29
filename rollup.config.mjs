@@ -5,6 +5,7 @@ import rollupTypescript from "rollup-plugin-typescript2";
 import babel from "@rollup/plugin-babel";
 import json from '@rollup/plugin-json';
 import terser from "@rollup/plugin-terser"; 
+import serve from 'rollup-plugin-serve';
 import { DEFAULT_EXTENSIONS } from "@babel/core";
 import pkg from "./package.json" assert { type: 'json' }; // 读取 package.json 配置
 const env = process.env.NODE_ENV; // 当前运行环境，可通过 cross-env 命令行设置
@@ -60,6 +61,17 @@ if (env === 'production') {
           warnings: false 
       } 
   })) 
+} 
+
+// 测试环境才需要服务
+if (env !== 'production') { 
+  config.plugins.push(
+    serve({
+      contentBase: ['example', 'dist'],
+      port: 3388,
+      open: true,
+    })
+  ) 
 } 
 
 export default config;
