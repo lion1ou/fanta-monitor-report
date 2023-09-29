@@ -1,7 +1,9 @@
 import device from './h5/h5BaseInfo/device'
 import { type InitParams } from './types/index'
 import log from './utils/log'
-import { getIp } from './utils/'
+import { getIp } from './utils/index'
+
+log.info('sdk init ...')
 
 const initReport = async (params?: InitParams) => {
   log.info('device', device)

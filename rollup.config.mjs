@@ -26,22 +26,19 @@ const config = {
       format: "umd",
       name,
     },
-    {
-      file: 'dist/bundle.iife.js',
-      format: "iife",
-      name,
-    },
   ],
   plugins: [
     json(),
      // 解析第三方依赖 
-     resolve(), 
+    resolve({ jsnext: true, preferBuiltins: true, browser: true }), 
      // 识别 commonjs 模式第三方依赖 
      commonjs(),
      // rollup 编译 typescript 
-     rollupTypescript(), 
+    rollupTypescript(), 
      // babel 配置 
-     babel({ 
+    babel({ 
+        babelHelpers: 'runtime',
+        skipPreflightCheck: true,
          // 只转换源代码，不转换外部依赖 
          exclude: 'node_modules/**', 
          // babel 默认不支持 ts 需要手动添加 
@@ -49,7 +46,7 @@ const config = {
              ...DEFAULT_EXTENSIONS, 
              '.ts', 
          ], 
-     }), 
+    }),
   ],
 };
 

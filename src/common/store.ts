@@ -1,5 +1,5 @@
 const initState = {
-  debug: false
+  debug: true
 }
 
 const Store = {
