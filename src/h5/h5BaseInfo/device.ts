@@ -1,9 +1,10 @@
+const ua = window.navigator.userAgent
+
 // 获取系统信息
 export const getOS = (): {
   os: string
   osVersion: string
 } => {
-  const ua = window.navigator.userAgent
   let os = ''
   let osVersion = ''
   const osArr = [
@@ -80,6 +81,47 @@ export const getOS = (): {
     osVersion
   }
 }
+
+const checkBot = (): {
+  browser: string
+  browserVersion: string
+  isBot: boolean
+  isWebview: boolean
+} | null => {
+// 判断是否是机器人
+  const botArr = [
+    { s: 'Googlebot', r: /Googlebot/, v: /Googlebot\/([\d\.]+)/ },
+    { s: 'Baiduspider', r: /Baiduspider/, v: /Baiduspider\/([\d\.]+)/ },
+    { s: 'Bingbot', r: /Bingbot/, v: /Bingbot\/([\d\.]+)/ },
+    { s: '360Spider', r: /360Spider|HaosouSpider/, v: /360Spider\/([\d\.]+)/ },
+    { s: 'YisouSpider', r: /YisouSpider/, v: /YisouSpider\/([\d\.]+)/ },
+    { s: 'YodaoBot', r: /YodaoBot/, v: /YodaoBot\/([\d\.]+)/ },
+    { s: 'YandexBot', r: /YandexBot/, v: /YandexBot\/([\d\.]+)/ },
+    { s: 'Sogouspider', r: /Sogou (\S+) Spider/, v: /Sogou (\S+) Spider\/([\d\.]+)/ },
+    { s: 'Bytespider', r: /Bytespider/, v: /Bytespider\/([\d\.]+)/ },
+    { s: 'ia_archiver', r: /ia_archiver/, v: /ia_archiver/ },
+    { s: 'nuhk', r: /nuhk/, v: /nuhk\/([\d\.]+)/ },
+    { s: 'Openbot', r: /Openbot/, v: /Openbot\/([\d\.]+)/ },
+    { s: 'Slurp', r: /Slurp/, v: /Slurp\/([\d\.]+)/ },
+    { s: 'MSNBot', r: /MSNBot/, v: /MSNBot\/([\d\.]+)/ },
+    { s: 'Ask Jeeves\/Teoma', r: /Ask Jeeves\/Teoma/, v: /Ask Jeeves\/Teoma/ },
+    { s: 'Yammybot', r: /Yammybot/, v: /Yammybot\/([\d\.]+)/ }
+  ]
+
+  for (const iterator of botArr) {
+    if (iterator.r.test(ua)) {
+      const matches = iterator.v.exec(ua)
+      return {
+        browser: iterator.s,
+        browserVersion: matches ? matches[1] : '',
+        isBot: true,
+        isWebview: false
+      }
+    }
+  }
+  return null
+}
+
 // 获取浏览器信息
 export const getBrower = (): {
   browser: string
@@ -87,152 +129,77 @@ export const getBrower = (): {
   isBot: boolean
   isWebview: boolean
 } => {
-  const ua = window.navigator.userAgent
   let browser = ''
   let browserVersion = ''
-  let isBot = false
+  const isBot = false
   const isWebview = ua.includes('; wv)')
 
   // 判断是否是机器人
-  const botArr = [
-    { s: 'Googlebot', r: /Googlebot/ },
-    { s: 'Baiduspider', r: /Baiduspider/ },
-    { s: 'Bingbot', r: /Bingbot/ },
-    { s: '360Spider', r: /360Spider|HaosouSpider/ },
-    { s: 'YisouSpider', r: /YisouSpider/ },
-    { s: 'YodaoBot', r: /YodaoBot/ },
-    { s: 'YandexBot', r: /YandexBot/ },
-    { s: 'Sogouspider', r: /Sogou (\S+) Spider/ },
-    { s: 'Bytespider', r: /Bytespider/ },
-    { s: 'ia_archiver', r: /ia_archiver/ },
-    { s: 'nuhk', r: /nuhk/ },
-    { s: 'Openbot', r: /Openbot/ },
-    { s: 'Slurp', r: /Slurp/ },
-    { s: 'MSNBot', r: /MSNBot/ },
-    { s: 'Ask Jeeves\/Teoma', r: /Ask Jeeves\/Teoma/ },
-    { s: 'Yammybot', r: /Yammybot/ }
+  const botInfo = checkBot()
+  if (botInfo) {
+    return botInfo
+  }
+
+  const browserArr = [
+    // 浏览器信息,前后顺序有关联
+    // 国外浏览器
+    { s: 'Safari', r: /Safari/, v: /Safari\/([\d\.]+)/ }, // 已测试
+    { s: 'Chrome', r: /Chrome|Chromium|CriOS/, v: /[Chrome|Chromium|CriOS]\/([\d\.]+)/ }, // 已测试
+    { s: 'IE', r: /MSIE|Trident/, v: /MSIE ([\d\.]+);|rv:([\d\.]+)/ }, // 已测试
+    { s: 'Edge', r: /Edge|Edg\/|EdgA|EdgiOS/, v: /Edge\/([\d\.]+)|Edg\/([\d\.]+)|EdgA\/([\d\.]+)|EdgiOS\/([\d\.]+)/ }, // 已测试
+    { s: 'Firefox', r: /Firefox|FxiOS/, v: /Firefox\/([\d\.]+)|FxiOS\/([\d\.]+)/ }, // 已测试
+    { s: 'Chromium', r: /Chromium/, v: /Chromium\/([\d\.]+)/ }, // 只有较老版本的 Chromium 才会包含 Chromium 字段
+    { s: 'Opera', r: /Opera|OPR/, v: /Opera\/([\d\.]+)|OPR\/([\d\.]+)/ }, // 已测试
+    { s: 'Vivaldi', r: /Vivaldi/, v: /Vivaldi\/([\d\.]+)/ }, // 已测试
+    { s: 'Yandex', r: /YaBrowser/, v: /YaBrowser\/([\d\.]+)/ },
+    { s: 'Arora', r: /Arora/, v: /Arora\/([\d\.]+)/ },
+    { s: 'Lunascape', r: /Lunascape/, v: /Lunascape[\/\s]([\d\.]+)/ },
+    { s: 'QupZilla', r: /QupZilla/, v: /QupZilla[\/\s]([\d\.]+)/ },
+    { s: 'Kindle', r: /Kindle|Silk\//, v: /Kindle\/([\d\.]+)|Silk\/([\d\.]+)/ },
+    { s: 'Iceweasel', r: /Iceweasel/, v: /Iceweasel\/([\d\.]+)/ },
+    { s: 'Konqueror', r: /Konqueror/, v: /Konqueror\/([\d\.]+)/ },
+    { s: 'Iceape', r: /Iceape/, v: /Iceape\/([\d\.]+)/ },
+    { s: 'SeaMonkey', r: /SeaMonkey/, v: /SeaMonkey\/([\d\.]+)/ },
+    { s: 'Epiphany', r: /Epiphany/, v: /Epiphany\/([\d\.]+)/ },
+    { s: 'Electron', r: /Electron/, v: /Electron\/([\d\.]+)/ },
+    // 国内浏览器
+    { s: '360', r: /QihooBrowser|QHBrowser/, v: /QihooBrowser\/([\d\.]+)|QHBrowser\/([\d\.]+)/ },
+    { s: '360EE', r: /360EE/, v: /360EE\/([\d\.]+)/ },
+    { s: '360SE', r: /360SE/, v: /360SE\/([\d\.]+)/ },
+    { s: 'UC', r: /UCBrowser| UBrowser|UCWEB/, v: /UCBrowser\/([\d\.]+)| UBrowser\/([\d\.]+)|UCWEB\/([\d\.]+)/ }, // 已测试
+    { s: 'QQBrowser', r: /QQBrowser/, v: /QQBrowser\/([\d\.]+)/ }, // 已测试
+    { s: 'Sogou', r: /MetaSr|Sogou/, v: /MetaSr\s([\d\.]+)|SogouMobileBrowser\/([\d\.]+)/ }, // 已测试
+    { s: 'Quark', r: /Quark/, v: /Quark\/([\d\.]+)/ }, // 已测试
+    { s: 'Liebao', r: /LBBROWSER|LieBaoFast/, v: /LBBROWSER\/([\d\.]+)|LieBaoFast\/([\d\.]+)/ }, // 已测试
+    { s: 'TheWorld', r: /TheWorld/, v: /TheWorld ([\d\.]+)/ }, // 已测试
+    // 手机厂商
+    { s: 'MiuiBrowser', r: /MiuiBrowser/, v: /MiuiBrowser\/([\d\.]+)/ }, // 已测试
+    { s: 'HuaweiBrowser', r: /HuaweiBrowser|HUAWEI\/|HBPC\//, v: /HuaweiBrowser\/([\d\.]+)|HUAWEI\/([\d\.]+)|HBPC\/([\d\.]+)/ },
+    { s: 'HONOR', r: /HONOR\//, v: /HONOR\/([\d\.]+)/ },
+    { s: 'VivoBrowser', r: /VivoBrowser/, v: /VivoBrowser\/([\d\.]+)/ },
+    { s: 'OPPOBrowser', r: /HeyTapBrowser/, v: /HeyTapBrowser\/([\d\.]+)/ },
+    // 应用容器
+    { s: 'QQ', r: /QQ\//, v: /QQ\/([\d\.]+)/ },
+    { s: 'Baidu', r: /Baidu|BIDUBrowser|baidubrowser|baiduboxapp|BaiduHD/, v: /BIDUBrowser[\s\/]([\d\.]+)|baidubrowser[\s\/]([\d\.]+)|baiduboxapp\/([\d\.]+)|BaiduHD\/([\d\.]+)/ },
+    { s: 'Weibo', r: /Weibo/, v: /Weibo__([\d\.]+)/ },
+    { s: 'Douban', r: /com.douban.frodo/, v: /com.douban.frodo\/([\d\.]+)/ },
+    { s: 'Douyin', r: /aweme/, v: /aweme\/([\d\.]+)/ },
+    { s: 'Toutiao', r: /NewsArticle/, v: /NewsArticle\/([\d\.]+)/ },
+    { s: 'Taobao', r: /AliApp\(TB/, v: /AliApp\(TB\/([\d\.]+)/ },
+    { s: 'uTools', r: /uTools/, v: /uTools\/([\d\.]+)/ }
+
   ]
 
-  for (const iterator of botArr) {
+  for (let i = browserArr.length - 1; i >= 0; i--) {
+    const iterator = browserArr[i]
     if (iterator.r.test(ua)) {
+      const matches = iterator.v.exec(ua)
+      console.log('matches', matches)
       browser = iterator.s
-      isBot = true
+      browserVersion = matches ? (matches[1] ? matches[1] : matches[2]) : ''
       break
     }
   }
-
-  // let verOffset = ua.indexOf('Opera')
-  // if (verOffset !== -1) {
-  //   browser = 'Opera'
-  //   browserVersion = ua.substring(verOffset + 6)
-  //   verOffset = ua.indexOf('Version')
-  //   if (verOffset !== -1) {
-  //     browserVersion = ua.substring(verOffset + 8)
-  //   }
-  // }
-
-  // if (ua.includes('OPR')) {
-  //   browser = 'Opera'
-  //   verOffset = ua.indexOf('OPR')
-  //   browserVersion = ua.substring(verOffset + 4)
-  // } else if (ua.includes('MSIE')) {
-  //   browser = 'Microsoft Internet Explorer'
-  //   verOffset = ua.indexOf('MSIE')
-  //   browserVersion = ua.substring(verOffset + 5)
-  // } else if (ua.includes('Chrome')) {
-  //   browser = 'Chrome'
-  //   verOffset = ua.indexOf('Chrome')
-  //   browserVersion = ua.substring(verOffset + 7)
-  // } else if (ua.includes('Safari')) {
-  //   browser = 'Safari'
-  //   verOffset = ua.indexOf('Safari')
-  //   browserVersion = ua.substring(verOffset + 7)
-  //   if (ua.includes('Version')) {
-  //     verOffset = ua.indexOf('Version')
-  //     browserVersion = ua.substring(verOffset + 8)
-  //   }
-  // } else if (ua.includes('Firefox')) {
-  //   browser = 'Firefox'
-  //   verOffset = ua.indexOf('Firefox')
-  //   browserVersion = ua.substring(verOffset + 8)
-  // } else if (ua.includes('Trident/')) {
-  //   browser = 'Microsoft Internet Explorer'
-  //   browserVersion = ua.substring(ua.indexOf('rv:') + 3)
-  // } else if (/weibo/i.test(ua)) {
-  //   browser = 'Weibo'
-  // } else if (/ qq/i.test(ua)) {
-  //   browser = 'QQ'
-  // } else if (/mqqbrowser/i.test(ua)) {
-  //   browser = 'QQBrowser'
-  // } else if (/UCBrowser/i.test(ua)) {
-  //   browser = 'UC'
-  // } else if (ua.lastIndexOf(' ') + 1 < ua.lastIndexOf('/')) {
-  //   const nameOffset = ua.lastIndexOf(' ')
-  //   verOffset = ua.lastIndexOf('/')
-  //   browser = ua.substring(nameOffset, verOffset)
-  //   browserVersion = ua.substring(verOffset + 1)
-  // }
-
-  const browserMap: Record<string, boolean> = {
-    // 浏览器 - 国外浏览器
-    Safari: ua.includes('Safari'),
-    Chrome: ua.includes('Chrome') || ua.includes('CriOS'),
-    IE: ua.includes('MSIE') || ua.includes('Trident'),
-    Edge: ua.includes('Edge') || ua.includes('Edg/') || ua.includes('EdgA') || ua.includes('EdgiOS'),
-    Firefox: ua.includes('Firefox') || ua.includes('FxiOS'),
-    'Firefox Focus': ua.includes('Focus'),
-    Chromium: ua.includes('Chromium'),
-    Opera: ua.includes('Opera') || ua.includes('OPR'),
-    Vivaldi: ua.includes('Vivaldi'),
-    Yandex: ua.includes('YaBrowser'),
-    Brave: !!(window.navigator as any).brave,
-    Arora: ua.includes('Arora'),
-    Lunascape: ua.includes('Lunascape'),
-    QupZilla: ua.includes('QupZilla'),
-    'Coc Coc': ua.includes('coc_coc_browser'),
-    Kindle: ua.includes('Kindle') || ua.includes('Silk/'),
-    Iceweasel: ua.includes('Iceweasel'),
-    Konqueror: ua.includes('Konqueror'),
-    Iceape: ua.includes('Iceape'),
-    SeaMonkey: ua.includes('SeaMonkey'),
-    Epiphany: ua.includes('Epiphany'),
-    // 浏览器 - 国内浏览器
-    360: ua.includes('QihooBrowser') || ua.includes('QHBrowser'),
-    '360EE': ua.includes('360EE'),
-    '360SE': ua.includes('360SE'),
-    UC: ua.includes('UCBrowser') || ua.includes(' UBrowser') || ua.includes('UCWEB'),
-    QQBrowser: ua.includes('QQBrowser'),
-    QQ: ua.includes('QQ/'),
-    Baidu: ua.includes('Baidu') || ua.includes('BIDUBrowser') || ua.includes('baidubrowser') || ua.includes('baiduboxapp') || ua.includes('BaiduHD'),
-    Maxthon: ua.includes('Maxthon'),
-    Sogou: ua.includes('MetaSr') || ua.includes('Sogou'),
-    Liebao: ua.includes('LBBROWSER') || ua.includes('LieBaoFast'),
-    '2345Explorer': ua.includes('2345Explorer') || ua.includes('Mb2345Browser') || ua.includes('2345chrome') || (window as any).chrome.adblock2345 || (window as any).chrome.common2345,
-    '115Browser': ua.includes('115Browser'),
-    TheWorld: ua.includes('TheWorld'),
-    Quark: ua.includes('Quark'),
-    Qiyu: ua.includes('Qiyu'),
-    // 浏览器 - 手机厂商
-    XiaoMi: ua.includes('MiuiBrowser'),
-    Huawei: ua.includes('HuaweiBrowser') || ua.includes('HUAWEI/') || ua.includes('HONOR') || ua.includes('HBPC/'),
-    Vivo: ua.includes('VivoBrowser'),
-    OPPO: ua.includes('HeyTapBrowser'),
-    // 浏览器 - 客户端
-    Taobao: ua.includes('AliApp(TB'),
-    Alipay: ua.includes('AliApp(AP'),
-    Weibo: ua.includes('Weibo'),
-    Douban: ua.includes('com.douban.frodo'),
-    Suning: ua.includes('SNEBUY-APP'),
-    iQiYi: ua.includes('IqiyiApp'),
-    DingTalk: ua.includes('DingTalk'),
-    Douyin: ua.includes('aweme')
-  }
-
-  Object.keys(browserMap).forEach((key: string) => {
-    if (browserMap[key]) {
-      browser = key
-    }
-  })
 
   // 阿里环境判断
   const alipayMatches = ua.match(/\s*AlipayClient\/([\d\.]+)/i)
@@ -279,7 +246,6 @@ export const getBrower = (): {
 }
 
 export const getDeviceType = (): string => {
-  const ua = window.navigator.userAgent
   const typeArr = [
     { s: 'Mobile', r: /Mobi|iPh|480/ },
     { s: 'Tablet', r: /Tablet|Nexus 7/ },
@@ -295,7 +261,6 @@ export const getDeviceType = (): string => {
 }
 
 export const getBrowerEngine = (): string => {
-  const ua = window.navigator.userAgent
   // 判断浏览器内核
   const engineArr = [
     { s: 'Trident', r: /Trident|NET CLR/ },
@@ -312,4 +277,56 @@ export const getBrowerEngine = (): string => {
     }
   }
   return 'Unknow'
+}
+
+export const getOrientation = (): string => {
+  const orientation = window.screen.orientation
+  return orientation
+    .type
+    .startsWith('portrait')
+    ? 'portrait'
+    : 'landscape'
+}
+
+export const getScreenInfo = () => {
+  return {
+    screenWidth: window.screen.width,
+    screenHeight: window.screen.height,
+    viewportWidth: window.innerWidth,
+    viewportHeight: window.innerHeight
+  }
+}
+
+export const getMobileModel = () => {
+  let brand = 'unknown'
+  let model = 'unknown'
+  const regInfo = ua.match(/\((.*?)\)/)
+  const info = regInfo ? regInfo[1] : ''
+
+  console.log('手机品牌：' + brand)
+  console.log('手机型号：' + model)
+
+  if (ua.match(/iPhone/i)) { // iPhone
+    model = 'iPhone'
+  } else if (ua.match(/iPad/i)) { // iPad
+    model = 'iPad'
+  } else if (ua.match(/Android/i)) { // Android phones
+    model = 'Android phone'
+    const arr = info.split(';').reverse()
+    console.log('arr', arr)
+    arr.forEach((item) => {
+      if (item.includes('Build/')) {
+        brand = item.split('Build/')[0].trim()
+        model = item.split('Build/')[1].trim()
+      }
+      console.log('brand', brand, 'model', model)
+    })
+  } else if (ua.match(/Tablet/i)) { // Android tablets
+    model = 'Android tablet'
+  }
+
+  return {
+    mobileBrand: brand,
+    mobileModel: model
+  }
 }
