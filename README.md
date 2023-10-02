@@ -7,5 +7,3 @@ fanta is a frontend monitor report sdk
 
 
 ### TODO
-
-* 添加移动端设备型号和品牌字段

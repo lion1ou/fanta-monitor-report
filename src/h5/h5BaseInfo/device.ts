@@ -42,7 +42,8 @@ export const getOS = (): {
     { s: 'Debian', r: /Debian/ },
     { s: 'FreeBSD', r: /FreeBSD/ },
     { s: 'WebOS', r: /webOS|hpwOS/ },
-    { s: 'HarmonyOS', r: /HarmonyOS/ }
+    { s: 'HarmonyOS', r: /HarmonyOS/ },
+    { s: 'BlackBerry', r: /BlackBerry|RIM|BB10/ }
   ]
   for (const iterator of osArr) {
     if (iterator.r.test(ua)) {
@@ -196,7 +197,7 @@ export const getBrower = (): {
       const matches = iterator.v.exec(ua)
       console.log('matches', matches)
       browser = iterator.s
-      browserVersion = matches ? (matches[1] ? matches[1] : matches[2]) : ''
+      browserVersion = matches ? (matches[1] || matches[0]?.split('/')[1]) : ''
       break
     }
   }
@@ -245,6 +246,7 @@ export const getBrower = (): {
   }
 }
 
+// 获取设备类型
 export const getDeviceType = (): string => {
   const typeArr = [
     { s: 'Mobile', r: /Mobi|iPh|480/ },
@@ -278,7 +280,7 @@ export const getBrowerEngine = (): string => {
   }
   return 'Unknow'
 }
-
+// 获取屏幕方向
 export const getOrientation = (): string => {
   const orientation = window.screen.orientation
   return orientation
@@ -287,7 +289,7 @@ export const getOrientation = (): string => {
     ? 'portrait'
     : 'landscape'
 }
-
+// 获取屏幕信息
 export const getScreenInfo = () => {
   return {
     screenWidth: window.screen.width,
@@ -300,29 +302,77 @@ export const getScreenInfo = () => {
 export const getMobileModel = () => {
   let brand = 'unknown'
   let model = 'unknown'
-  const regInfo = ua.match(/\((.*?)\)/)
-  const info = regInfo ? regInfo[1] : ''
+
+  const androidBrandArr = [
+    { s: 'Huawei', r: /huawei/ },
+    { s: 'HONOR', r: /honor/ },
+    { s: 'OPPO', r: /oppo/ },
+    { s: 'Vivo', r: /vivo/ },
+    { s: 'Xiaomi', r: /xiaomi/ },
+    { s: 'Redmi', r: /redmi/ },
+    { s: 'OnePlus', r: /oneplus/ },
+    { s: 'Realme', r: /realme/ },
+    { s: 'Meizu', r: /meizu/ },
+    { s: 'Samsung', r: /sm-/ },
+    { s: 'LG', r: /lg-/ },
+    { s: 'Sony', r: /sony/ },
+    { s: 'Motorola', r: /motorola/ },
+    { s: 'Lenovo', r: /lenovo/ },
+    { s: 'ZTE', r: /zte/ },
+    { s: 'Nubia', r: /nubia/ },
+    { s: 'Letv', r: /letv/ },
+    { s: 'Htc', r: /htc/ },
+    { s: 'Asus', r: /asus/ },
+    { s: 'Google', r: /google/ },
+    { s: 'BlackBerry', r: /blackberry/ },
+    { s: 'Nokia', r: /nokia/ },
+    { s: 'Microsoft', r: /microsoft/ },
+    { s: 'Panasonic', r: /panasonic/ }
+  ]
 
   console.log('手机品牌：' + brand)
   console.log('手机型号：' + model)
 
   if (ua.match(/iPhone/i)) { // iPhone
-    model = 'iPhone'
+    brand = 'iPhone'
+    const matches = /Mobile\/([\dA-Z]+)/.exec(ua)
+    model = matches ? matches[1] : 'unknown'
   } else if (ua.match(/iPad/i)) { // iPad
-    model = 'iPad'
-  } else if (ua.match(/Android/i)) { // Android phones
-    model = 'Android phone'
-    const arr = info.split(';').reverse()
-    console.log('arr', arr)
-    arr.forEach((item) => {
-      if (item.includes('Build/')) {
-        brand = item.split('Build/')[0].trim()
-        model = item.split('Build/')[1].trim()
-      }
-      console.log('brand', brand, 'model', model)
-    })
+    brand = 'iPad'
+    const matches = /Mobile\/([\dA-Z]+)/.exec(ua)
+    model = matches ? matches[1] : 'unknown'
   } else if (ua.match(/Tablet/i)) { // Android tablets
     model = 'Android tablet'
+    brand = 'unknown'
+    androidBrandArr.forEach((item) => {
+      if (item.r.test(ua.toLowerCase())) {
+        brand = item.s
+      }
+    })
+    const regInfo = ua.match(/\((.*?)\)/)
+    const info = regInfo ? regInfo[1] : ''
+    const arr = info.split(';').reverse()
+    arr.forEach((item) => {
+      if (item.includes('Build/')) {
+        model = item.trim()
+      }
+    })
+  } else if (ua.match(/Android/i)) { // Android phones
+    model = 'Android phone'
+    brand = 'unknown'
+    androidBrandArr.forEach((item) => {
+      if (item.r.test(ua.toLowerCase())) {
+        brand = item.s
+      }
+    })
+    const regInfo = ua.match(/\((.*?)\)/)
+    const info = regInfo ? regInfo[1] : ''
+    const arr = info.split(';').reverse()
+    arr.forEach((item) => {
+      if (item.includes('Build/')) {
+        model = item
+      }
+    })
   }
 
   return {

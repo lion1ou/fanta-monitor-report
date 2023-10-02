@@ -2,7 +2,7 @@ import { getBrower, getOS, getDeviceType, getBrowerEngine, getOrientation, getSc
 import { getIp } from './network'
 
 export const getBaseInfo = async () => {
-  const { userAgent, languages, language } = window.navigator
+  const { userAgent, language } = window.navigator
   const { os, osVersion } = getOS()
   const { browser, browserVersion, isBot, isWebview } = getBrower()
   const browserEngine = getBrowerEngine()
@@ -25,7 +25,6 @@ export const getBaseInfo = async () => {
     isBot, // 是否机器人
     isWebview, // 是否webview
     language, // 当前语言
-    languages, // 所有语言
     orientation, // 屏幕方向
     screenWidth, // 屏幕宽度
     screenHeight, // 屏幕高度
