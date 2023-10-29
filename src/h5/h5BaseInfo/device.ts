@@ -1,10 +1,7 @@
 const ua = window.navigator.userAgent
 
 // 获取系统信息
-export const getOS = (): {
-  os: string
-  osVersion: string
-} => {
+export const getOS = (): { os: string, osVersion: string } => {
   let os = ''
   let osVersion = ''
   const osArr = [
@@ -83,12 +80,8 @@ export const getOS = (): {
   }
 }
 
-const checkBot = (): {
-  browser: string
-  browserVersion: string
-  isBot: boolean
-  isWebview: boolean
-} | null => {
+// 判断是否是爬虫机器人
+const checkBot = (): { browser: string, browserVersion: string, isBot: boolean, isWebview: boolean } | null => {
 // 判断是否是机器人
   const botArr = [
     { s: 'Googlebot', r: /Googlebot/, v: /Googlebot\/([\d\.]+)/ },
@@ -124,12 +117,7 @@ const checkBot = (): {
 }
 
 // 获取浏览器信息
-export const getBrower = (): {
-  browser: string
-  browserVersion: string
-  isBot: boolean
-  isWebview: boolean
-} => {
+export const getBrower = (): { browser: string, browserVersion: string, isBot: boolean, isWebview: boolean } => {
   let browser = ''
   let browserVersion = ''
   const isBot = false
@@ -262,8 +250,8 @@ export const getDeviceType = (): string => {
   return 'Desktop'
 }
 
+// 判断浏览器内核
 export const getBrowerEngine = (): string => {
-  // 判断浏览器内核
   const engineArr = [
     { s: 'Trident', r: /Trident|NET CLR/ },
     { s: 'Presto', r: /Presto/ },
@@ -280,6 +268,7 @@ export const getBrowerEngine = (): string => {
   }
   return 'Unknow'
 }
+
 // 获取屏幕方向
 export const getOrientation = (): string => {
   const orientation = window.screen.orientation
@@ -289,6 +278,7 @@ export const getOrientation = (): string => {
     ? 'portrait'
     : 'landscape'
 }
+
 // 获取屏幕信息
 export const getScreenInfo = () => {
   return {
@@ -299,6 +289,8 @@ export const getScreenInfo = () => {
   }
 }
 
+// 获取移动端设备品牌和型号
+// TODO 不准确
 export const getMobileModel = () => {
   let brand = 'unknown'
   let model = 'unknown'
@@ -329,9 +321,6 @@ export const getMobileModel = () => {
     { s: 'Microsoft', r: /microsoft/ },
     { s: 'Panasonic', r: /panasonic/ }
   ]
-
-  console.log('手机品牌：' + brand)
-  console.log('手机型号：' + model)
 
   if (ua.match(/iPhone/i)) { // iPhone
     brand = 'iPhone'
