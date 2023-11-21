@@ -183,7 +183,6 @@ export const getBrower = (): { browser: string, browserVersion: string, isBot: b
     const iterator = browserArr[i]
     if (iterator.r.test(ua)) {
       const matches = iterator.v.exec(ua)
-      console.log('matches', matches)
       browser = iterator.s
       browserVersion = matches ? (matches[1] || matches[0]?.split('/')[1]) : ''
       break
@@ -272,11 +271,8 @@ export const getBrowerEngine = (): string => {
 // 获取屏幕方向
 export const getOrientation = (): string => {
   const orientation = window.screen.orientation
-  return orientation
-    .type
-    .startsWith('portrait')
-    ? 'portrait'
-    : 'landscape'
+  const res = orientation.type.startsWith('portrait') ? 'portrait' : 'landscape'
+  return res
 }
 
 // 获取屏幕信息

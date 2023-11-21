@@ -1,5 +1,6 @@
 import { getBrower, getOS, getDeviceType, getBrowerEngine, getOrientation, getScreenInfo, getMobileModel } from './device'
-import { getIp } from './network'
+import { getIp, getNetworkType } from './network'
+import { getLocation } from './location'
 
 export const getBaseInfo = async () => {
   const { userAgent, language } = window.navigator
@@ -11,6 +12,9 @@ export const getBaseInfo = async () => {
   const orientation = getOrientation()
   const { screenWidth, screenHeight, viewportWidth, viewportHeight } = getScreenInfo()
   const { mobileBrand, mobileModel } = getMobileModel()
+  const res = await getLocation()
+  const coordinates = res && res.flag === 'success' ? `${res.location.lng},${res.location.lat}` : ''
+  const { networkType, networkEffectiveType, networkSpeed, networkSpeedUnit } = await getNetworkType()
 
   return {
     userAgent, // 浏览器信息
@@ -30,8 +34,11 @@ export const getBaseInfo = async () => {
     screenHeight, // 屏幕高度
     viewportWidth, // 可视区域宽度
     viewportHeight, // 可视区域高度
-    coordinates: '', // 经纬度 逗号分隔 `经度,纬度`
-    networkType: '', // 网络类型
+    coordinates, // 经纬度 逗号分隔 `经度(longitude),纬度(latitude)`
+    networkType, // 网络类型
+    networkEffectiveType, // 网络连接类型
+    networkSpeed, // 网络连接速率
+    networkSpeedUnit, // 网络连接速率单位
     ip
   }
 }
