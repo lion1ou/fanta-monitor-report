@@ -1,6 +1,8 @@
 import { getBrower, getOS, getDeviceType, getBrowerEngine, getOrientation, getScreenInfo, getMobileModel } from './device'
-import { getIp, getNetworkType } from './network'
+import { getIp, getNetworkType, getGeo } from './other'
 import { getLocation } from './location'
+import { getLocal, getUUID, setLocal } from '../../utils'
+import { UUID_LOCAL_KEY } from '../../common/constant'
 
 export const getBaseInfo = async () => {
   const { userAgent, language } = window.navigator
@@ -12,9 +14,16 @@ export const getBaseInfo = async () => {
   const orientation = getOrientation()
   const { screenWidth, screenHeight, viewportWidth, viewportHeight } = getScreenInfo()
   const { mobileBrand, mobileModel } = getMobileModel()
-  const res = await getLocation()
+  const res = await getGeo()
   const coordinates = res && res.flag === 'success' ? `${res.location.lng},${res.location.lat}` : ''
-  const { networkType, networkEffectiveType, networkSpeed, networkSpeedUnit } = await getNetworkType()
+  const { networkType, networkEffectiveType } = await getNetworkType()
+  const location = getLocation()
+
+  const uuid = () => {
+    const id = getLocal('uuid') ?? getUUID()
+    setLocal(UUID_LOCAL_KEY, id)
+    return id
+  }
 
   return {
     userAgent, // 浏览器信息
@@ -37,8 +46,8 @@ export const getBaseInfo = async () => {
     coordinates, // 经纬度 逗号分隔 `经度(longitude),纬度(latitude)`
     networkType, // 网络类型
     networkEffectiveType, // 网络连接类型
-    networkSpeed, // 网络连接速率
-    networkSpeedUnit, // 网络连接速率单位
-    ip
+    ip,
+    uuid: uuid(),
+    location
   }
 }
