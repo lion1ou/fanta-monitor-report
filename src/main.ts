@@ -11,6 +11,8 @@ const version = '__VERSION__'
 
 const buildTime = '__BUILDTIME__'
 
+const sdkEnv = '__ENV__'
+
 const initReport = async (params?: InitParams) => {
   try {
     log.info('initReport params', params)
@@ -62,4 +64,4 @@ const custom = async (customData: any) => {
   await track(TrackType.Custom, customData);
 }
 
-export { initReport, pageView, click, error, custom, version, buildTime }
+export { initReport, pageView, click, error, custom, version, buildTime, sdkEnv }
