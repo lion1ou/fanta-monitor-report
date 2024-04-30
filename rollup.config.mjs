@@ -57,7 +57,7 @@ const config = {
 };
 
 // 若打包正式环境，压缩代码 
-if (env === 'production') { 
+if (env === 'pro') { 
   config.plugins.push(terser({ 
       compress: { 
           pure_getters: true, 
@@ -69,7 +69,7 @@ if (env === 'production') {
 } 
 
 // 测试环境才需要服务
-if (env !== 'production') { 
+if (env !== 'pro') { 
   config.plugins.push(
     serve({
       contentBase: ['example', 'dist'],
