@@ -35,7 +35,8 @@ const log = {
 
   error: (msg: any, optionalParams?: any) => {
     baseLog('error', msg, optionalParams, () => {
-      return Store.getDebug()
+      // 错误信息，默认会展示
+      return true
     })
   },
 

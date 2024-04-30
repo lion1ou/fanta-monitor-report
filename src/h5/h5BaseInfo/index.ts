@@ -2,6 +2,7 @@ import { getBrower, getOS, getDeviceType, getBrowerEngine, getOrientation, getSc
 import { getIp, getNetworkType, getGeo, uuid } from './other'
 import { getLocation } from './location'
 import { type IBaseInfo } from '../../types/index'
+import log from '../../utils/log'
 
 export const getBaseInfo = (): IBaseInfo => {
   const { userAgent, language } = window.navigator
@@ -14,8 +15,7 @@ export const getBaseInfo = (): IBaseInfo => {
   const { mobileBrand, mobileModel } = getMobileModel()
 
   const { pagePath, pageOrigin, pageSearch, pageProtocol } = getLocation()
-
-  return {
+  const result = {
     userAgent, // 浏览器信息
     deviceType, // 设备类型
     mobileBrand, // 手机品牌
@@ -38,23 +38,32 @@ export const getBaseInfo = (): IBaseInfo => {
     pageSearch,
     pageProtocol
   }
+  log.info('getBaseInfo', result)
+  return result
 }
 
 export const generateUuid = () => {
-  return uuid()
+  const result = uuid()
+  log.info('generateUuid', result)
+  return result
 }
 
 export const getGeoInfo = async () => {
   // 经纬度 逗号分隔 `经度(longitude),纬度(latitude)`
   const res = await getGeo()
   const coordinates = res && res.flag === 'success' ? `${res.location.lng},${res.location.lat}` : ''
+  log.info('getGeoInfo', coordinates)
   return coordinates
 }
 
 export const getIpAddress = async () => {
-  return await getIp()
+  const result = await getIp()
+  log.info('getIpAddress', result)
+  return result
 }
 
 export const getNetwork = async () => {
-  return await getNetworkType()
+  const result = await getNetworkType()
+  log.info('getNetwork', result)
+  return result
 }

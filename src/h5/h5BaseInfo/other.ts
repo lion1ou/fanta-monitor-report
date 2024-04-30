@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/member-delimiter-style */
 // 获取网络类型
-import axios from 'axios';
 import log from '../../utils/log';
 import { getLocal, getUUID, setLocal } from '../../utils'
+import { ajaxGet } from '../../common/request'
 import { UUID_LOCAL_KEY } from '../../common/constant';
 
 declare const navigator: any;
 
 export const getIp = async (): Promise<string> => {
   try {
-    const res = await axios.get('https://api.ipify.org?format=json');
+    const res: any = await ajaxGet('https://api.ipify.org?format=json');
     return res.data.ip;
   } catch (error) {
     log.warn('获取ip失败：', error);
     try {
-      const res = await axios.get('https://api.infoip.io/ip');
+      const res: any = await ajaxGet('https://api.infoip.io/ip');
       return res.data;
     } catch (error) {
       log.error('获取ip重试失败：', error);

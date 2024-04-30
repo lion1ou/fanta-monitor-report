@@ -9,8 +9,13 @@
       console.log(window.FantaReport);
       window.FantaReport.initReport({
         reportHost: 'http://localhost:5001/track',
+        debug: true,
+        appName: 'fantaTestPage',
       });
-      window.FantaReport.pageView();
+      const sT = setTimeout(() => {
+        window.FantaReport.pageView();
+        clearTimeout(sT);
+      }, 1000);
     </script>
     <style>
       #app {

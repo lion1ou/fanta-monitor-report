@@ -6,7 +6,7 @@ const initState: InitParams & IBaseInfo = {
   appName: '',
   appVersion: '',
   userId: '',
-  debug: true,
+  debug: false,
   // 基础信息
   userAgent: '', // 浏览器信息
   deviceType: '', // 设备类型
