@@ -56,4 +56,8 @@ const custom = async (customData: any) => {
   await track(TrackType.Custom, customData);
 }
 
-export { initReport, pageView, click, error, custom }
+const version = '__VERSION__'
+
+const buildTime = '__BUILDTIME__'
+
+export { initReport, pageView, click, error, custom, version, buildTime }
