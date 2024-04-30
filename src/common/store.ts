@@ -2,11 +2,13 @@ import { type IBaseInfo, type InitParams } from '../types'
 import { getBaseInfo, generateUuid, getGeoInfo, getIpAddress, getNetwork } from '../h5/h5BaseInfo'
 
 const initState: InitParams & IBaseInfo = {
+  // 本地数据
+  debug: false,
+  isReady: false,
   // 入参信息
   appName: '',
   appVersion: '',
   userId: '',
-  debug: false,
   // SDK信息
   sdkVersion: '',
   sdkBuildTime: '',
@@ -53,7 +55,8 @@ const Store = {
     if (key) {
       return this.state?.[key]
     }
-    return this.state
+    const { debug, ...rest } = this.state
+    return rest
   },
   setParams (params?: InitParams) {
     if (params) {
@@ -82,6 +85,7 @@ const Store = {
   setIp () {
     getIpAddress().then((ip) => {
       this.state.ip = ip
+      this.setReady(true)
     }, () => {})
   },
   setNetwork () {
@@ -103,6 +107,12 @@ const Store = {
   },
   setDebug (debug: boolean) {
     this.state.debug = debug
+  },
+  getReady () {
+    return this.state?.isReady ?? false
+  },
+  setReady (ready: boolean) {
+    this.state.isReady = ready
   }
 }
 

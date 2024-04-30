@@ -2,7 +2,7 @@ import { getBrower, getOS, getDeviceType, getBrowerEngine, getOrientation, getSc
 import { getIp, getNetworkType, getGeo, uuid } from './other'
 import { getLocation } from './location'
 import { type IBaseInfo } from '../../types/index'
-import log from '../../utils/log'
+import log from '../../common/log'
 
 export const getBaseInfo = (): IBaseInfo => {
   const { userAgent, language } = window.navigator

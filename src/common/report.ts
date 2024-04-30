@@ -1,4 +1,4 @@
-import log from '../utils/log'
+import log from './log'
 import Store from '../common/store'
 
 import { type IBaseInfo, type ITrackEvent, type InitParams } from '../types'

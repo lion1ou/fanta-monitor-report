@@ -1,9 +1,9 @@
 import { type InitParams, type ITrackEvent } from './types/index'
 import Store from './common/store'
-import log from './utils/log'
+import log from './common/log'
 import { sendReport } from './common/report'
 import { TrackType } from './types/enum'
-import { getUUID } from './utils'
+import { getUUID } from './common/utils'
 
 log.info('sdk init ...')
 

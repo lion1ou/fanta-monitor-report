@@ -1,4 +1,4 @@
-import Store from '../common/store'
+import Store from './store'
 
 const lvlColorMap: Record<string, string> = {
   log: '#59aaff',

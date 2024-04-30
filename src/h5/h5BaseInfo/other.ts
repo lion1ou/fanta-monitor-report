@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-delimiter-style */
 // 获取网络类型
-import log from '../../utils/log';
-import { getLocal, getUUID, setLocal } from '../../utils'
+import log from '../../common/log';
+import { getLocal, getUUID, setLocal } from '../../common/utils'
 import { ajaxGet } from '../../common/request'
 import { UUID_LOCAL_KEY } from '../../common/constant';
 
