@@ -7,6 +7,9 @@ const initState: InitParams & IBaseInfo = {
   appVersion: '',
   userId: '',
   debug: false,
+  // SDK信息
+  sdkVersion: '',
+  sdkBuildTime: '',
   // 基础信息
   userAgent: '', // 浏览器信息
   deviceType: '', // 设备类型
@@ -88,6 +91,10 @@ const Store = {
       this.state.networkType = networkType
       this.state.networkEffectiveType = networkEffectiveType
     }, () => {})
+  },
+  setSdkInfo (version: string, buildTime: string) {
+    this.state.sdkVersion = version
+    this.state.sdkBuildTime = buildTime
   },
   getDebug () {
     return this.state?.debug ?? false

@@ -7,6 +7,10 @@ import { getUUID } from './utils'
 
 log.info('sdk init ...')
 
+const version = '__VERSION__'
+
+const buildTime = '__BUILDTIME__'
+
 const initReport = async (params?: InitParams) => {
   try {
     log.info('initReport params', params)
@@ -16,6 +20,7 @@ const initReport = async (params?: InitParams) => {
     if (!params?.appName) {
       log.error('appName未配置，请添加上报接口')
     }
+    Store.setSdkInfo(version, buildTime)
     Store.setParams(params)
     Store.initData()
   } catch (error) {
@@ -37,6 +42,7 @@ const track = async (type: TrackType, customData?: any) => {
     ...baseInfo,
     ...trackData
   }
+  log.info(type, reportData)
   await sendReport(reportData)
 }
 
@@ -55,9 +61,5 @@ const error = async (customData: any) => {
 const custom = async (customData: any) => {
   await track(TrackType.Custom, customData);
 }
-
-const version = '__VERSION__'
-
-const buildTime = '__BUILDTIME__'
 
 export { initReport, pageView, click, error, custom, version, buildTime }
