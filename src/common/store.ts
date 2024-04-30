@@ -93,10 +93,10 @@ const Store = {
       this.state.networkEffectiveType = networkEffectiveType
     }, () => {})
   },
-  setSdkInfo (version: string, buildTime: string, sdkEnv: string) {
+  setSdkInfo (version: string, buildTime: string, env: string) {
     this.state.sdkVersion = version
     this.state.sdkBuildTime = buildTime
-    this.state.sdkEnv = sdkEnv
+    this.state.sdkEnv = env
   },
   getDebug () {
     return this.state?.debug ?? false

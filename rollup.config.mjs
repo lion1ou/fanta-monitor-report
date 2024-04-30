@@ -48,6 +48,11 @@ const config = {
              '.ts', 
          ], 
     }),
+    replace({
+      '__VERSION__': pkg.version,
+      '__BUILDTIME__': new Date().toLocaleString(),
+      '__ENV__': env
+    })
   ],
 };
 
@@ -61,13 +66,6 @@ if (env === 'production') {
           warnings: false 
       } 
   })) 
-  config.plugins.push(
-    replace({
-      '__VERSION__': pkg.version,
-      '__BUILDTIME__': new Date().toLocaleString(),
-      '__ENV__': 'production'
-    })
-  ) 
 } 
 
 // 测试环境才需要服务
@@ -77,13 +75,6 @@ if (env !== 'production') {
       contentBase: ['example', 'dist'],
       port: 3388,
       open: true,
-    })
-  ) 
-  config.plugins.push(
-    replace({
-      '__VERSION__': pkg.version,
-      '__BUILDTIME__': new Date().toLocaleString(),
-      '__ENV__': 'development'
     })
   ) 
 } 

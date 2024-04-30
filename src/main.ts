@@ -11,7 +11,7 @@ const version = '__VERSION__'
 
 const buildTime = '__BUILDTIME__'
 
-const sdkEnv = '__ENV__'
+const env = '__ENV__'
 
 const initReport = async (params?: InitParams) => {
   try {
@@ -22,7 +22,7 @@ const initReport = async (params?: InitParams) => {
     if (!params?.appName) {
       log.error('appName未配置，请添加上报接口')
     }
-    Store.setSdkInfo(version, buildTime)
+    Store.setSdkInfo(version, buildTime, env)
     Store.setParams(params)
     Store.initData()
   } catch (error) {
@@ -64,4 +64,4 @@ const custom = async (customData: any) => {
   await track(TrackType.Custom, customData);
 }
 
-export { initReport, pageView, click, error, custom, version, buildTime, sdkEnv }
+export { initReport, pageView, click, error, custom, version, buildTime, env }
