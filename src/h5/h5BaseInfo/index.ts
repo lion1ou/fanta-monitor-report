@@ -1,34 +1,24 @@
 import { getBrower, getOS, getDeviceType, getBrowerEngine, getOrientation, getScreenInfo, getMobileModel } from './device'
-import { getIp, getNetworkType, getGeo } from './other'
+import { getIp, getNetworkType, getGeo, uuid } from './other'
 import { getLocation } from './location'
-import { getLocal, getUUID, setLocal } from '../../utils'
-import { UUID_LOCAL_KEY } from '../../common/constant'
+import { type IBaseInfo } from '../../types/index'
 
-export const getBaseInfo = async () => {
+export const getBaseInfo = (): IBaseInfo => {
   const { userAgent, language } = window.navigator
   const { os, osVersion } = getOS()
   const { browser, browserVersion, isBot, isWebview } = getBrower()
   const browserEngine = getBrowerEngine()
   const deviceType = getDeviceType()
-  const ip = await getIp()
   const orientation = getOrientation()
   const { screenWidth, screenHeight, viewportWidth, viewportHeight } = getScreenInfo()
   const { mobileBrand, mobileModel } = getMobileModel()
-  const res = await getGeo()
-  const coordinates = res && res.flag === 'success' ? `${res.location.lng},${res.location.lat}` : ''
-  const { networkType, networkEffectiveType } = await getNetworkType()
-  const location = getLocation()
 
-  const uuid = () => {
-    const id = getLocal('uuid') ?? getUUID()
-    setLocal(UUID_LOCAL_KEY, id)
-    return id
-  }
+  const { pagePath, pageOrigin, pageSearch, pageProtocol } = getLocation()
 
   return {
     userAgent, // 浏览器信息
     deviceType, // 设备类型
-    mobileBrand,
+    mobileBrand, // 手机品牌
     mobileModel, // 手机型号
     os, // 操作系统
     osVersion, // 操作系统版本
@@ -43,11 +33,28 @@ export const getBaseInfo = async () => {
     screenHeight, // 屏幕高度
     viewportWidth, // 可视区域宽度
     viewportHeight, // 可视区域高度
-    coordinates, // 经纬度 逗号分隔 `经度(longitude),纬度(latitude)`
-    networkType, // 网络类型
-    networkEffectiveType, // 网络连接类型
-    ip,
-    uuid: uuid(),
-    location
+    pagePath,
+    pageOrigin,
+    pageSearch,
+    pageProtocol
   }
+}
+
+export const generateUuid = () => {
+  return uuid()
+}
+
+export const getGeoInfo = async () => {
+  // 经纬度 逗号分隔 `经度(longitude),纬度(latitude)`
+  const res = await getGeo()
+  const coordinates = res && res.flag === 'success' ? `${res.location.lng},${res.location.lat}` : ''
+  return coordinates
+}
+
+export const getIpAddress = async () => {
+  return await getIp()
+}
+
+export const getNetwork = async () => {
+  return await getNetworkType()
 }

@@ -1,8 +1,12 @@
 export const getLocation = () => {
-  console.log(window.location)
-
-  const path = window.location.pathname
+  const pagePath = window?.location?.pathname || ''
+  const pageOrigin = window?.location?.origin || ''
+  const pageSearch = window?.location?.search?.split('?')[1] || ''
+  const pageProtocol = window?.location?.protocol || ''
   return {
-    path
+    pagePath,
+    pageOrigin,
+    pageSearch,
+    pageProtocol
   }
 }

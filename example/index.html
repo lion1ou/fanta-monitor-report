@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Example</title>
-  <script src="./bundle.umd.js"></script>
-  <style>
-    #app {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      width: 100vw;
-    }
-  </style>
-</head>
-<body>
-  <div id="app">
-    <h1>打开开发者工具查看控制台</h1>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example</title>
+    <script src="./bundle.umd.js"></script>
+    <script>
+      console.log(window.FantaReport);
+      window.FantaReport.initReport({
+        reportHost: 'http://localhost:5001/track',
+      });
+      window.FantaReport.pageView();
+    </script>
+    <style>
+      #app {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <h1>打开开发者工具查看控制台</h1>
+    </div>
+  </body>
 </html>

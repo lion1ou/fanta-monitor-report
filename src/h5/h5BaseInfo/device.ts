@@ -1,9 +1,12 @@
-const ua = window.navigator.userAgent
+import { type IGetOs, type IBrowser } from '../../types';
+import { DeviceType } from '../../types/enum'
+
+const ua = window.navigator.userAgent;
 
 // 获取系统信息
-export const getOS = (): { os: string, osVersion: string } => {
-  let os = ''
-  let osVersion = ''
+export const getOS = (): IGetOs => {
+  let os = '';
+  let osVersion = '';
   const osArr = [
     { s: 'Windows 10', r: /(Windows 10.0|Windows NT 10.0)/ },
     { s: 'Windows 8.1', r: /(Windows 8.1|Windows NT 6.3)/ },
@@ -40,49 +43,49 @@ export const getOS = (): { os: string, osVersion: string } => {
     { s: 'FreeBSD', r: /FreeBSD/ },
     { s: 'WebOS', r: /webOS|hpwOS/ },
     { s: 'HarmonyOS', r: /HarmonyOS/ },
-    { s: 'BlackBerry', r: /BlackBerry|RIM|BB10/ }
-  ]
+    { s: 'BlackBerry', r: /BlackBerry|RIM|BB10/ },
+  ];
   for (const iterator of osArr) {
     if (iterator.r.test(ua)) {
-      os = iterator.s
-      break
+      os = iterator.s;
+      break;
     }
   }
 
-  let execRes
+  let execRes;
   if (os.includes('Windows')) {
-    execRes = /Windows (.*)/.exec(os)
-    osVersion = execRes ? execRes[1] : ''
-    os = 'Windows'
+    execRes = /Windows (.*)/.exec(os);
+    osVersion = execRes ? execRes[1] : '';
+    os = 'Windows';
   }
   switch (os) {
     case 'Mac OS X':
-      execRes = /Mac OS X (10[\.\_\d]+)/.exec(ua)
-      osVersion = execRes ? execRes[1].replace(/_/g, '.') : ''
-      break
+      execRes = /Mac OS X (10[\.\_\d]+)/.exec(ua);
+      osVersion = execRes ? execRes[1].replace(/_/g, '.') : '';
+      break;
     case 'Android':
-      execRes = /Android ([\.\_\d]+)/.exec(ua)
-      osVersion = execRes ? execRes[1] : ''
-      break
+      execRes = /Android ([\.\_\d]+)/.exec(ua);
+      osVersion = execRes ? execRes[1] : '';
+      break;
     case 'iOS':
-      execRes = /OS ([\.\_\d]+)/.exec(ua)
-      osVersion = execRes ? execRes[1].replace(/_/g, '.') : ''
-      break
+      execRes = /OS ([\.\_\d]+)/.exec(ua);
+      osVersion = execRes ? execRes[1].replace(/_/g, '.') : '';
+      break;
     case 'HarmonyOS':
-      execRes = /HarmonyOS ([\.\_\d]+)/.exec(ua)
-      osVersion = execRes ? execRes[1].replace(/_/g, '.') : ''
-      break
+      execRes = /HarmonyOS ([\.\_\d]+)/.exec(ua);
+      osVersion = execRes ? execRes[1].replace(/_/g, '.') : '';
+      break;
   }
 
   return {
     os,
-    osVersion
-  }
-}
+    osVersion,
+  };
+};
 
 // 判断是否是爬虫机器人
-const checkBot = (): { browser: string, browserVersion: string, isBot: boolean, isWebview: boolean } | null => {
-// 判断是否是机器人
+const checkBot = (): IBrowser | null => {
+  // 判断是否是机器人
   const botArr = [
     { s: 'Googlebot', r: /Googlebot/, v: /Googlebot\/([\d\.]+)/ },
     { s: 'Baiduspider', r: /Baiduspider/, v: /Baiduspider\/([\d\.]+)/ },
@@ -98,35 +101,35 @@ const checkBot = (): { browser: string, browserVersion: string, isBot: boolean, 
     { s: 'Openbot', r: /Openbot/, v: /Openbot\/([\d\.]+)/ },
     { s: 'Slurp', r: /Slurp/, v: /Slurp\/([\d\.]+)/ },
     { s: 'MSNBot', r: /MSNBot/, v: /MSNBot\/([\d\.]+)/ },
-    { s: 'Ask Jeeves\/Teoma', r: /Ask Jeeves\/Teoma/, v: /Ask Jeeves\/Teoma/ },
-    { s: 'Yammybot', r: /Yammybot/, v: /Yammybot\/([\d\.]+)/ }
-  ]
+    { s: 'Ask Jeeves/Teoma', r: /Ask Jeeves\/Teoma/, v: /Ask Jeeves\/Teoma/ },
+    { s: 'Yammybot', r: /Yammybot/, v: /Yammybot\/([\d\.]+)/ },
+  ];
 
   for (const iterator of botArr) {
     if (iterator.r.test(ua)) {
-      const matches = iterator.v.exec(ua)
+      const matches = iterator.v.exec(ua);
       return {
         browser: iterator.s,
         browserVersion: matches ? matches[1] : '',
         isBot: true,
-        isWebview: false
-      }
+        isWebview: false,
+      };
     }
   }
-  return null
-}
+  return null;
+};
 
 // 获取浏览器信息
-export const getBrower = (): { browser: string, browserVersion: string, isBot: boolean, isWebview: boolean } => {
-  let browser = ''
-  let browserVersion = ''
-  const isBot = false
-  const isWebview = ua.includes('; wv)')
+export const getBrower = (): IBrowser => {
+  let browser = '';
+  let browserVersion = '';
+  const isBot = false;
+  const isWebview = ua.includes('; wv)');
 
   // 判断是否是机器人
-  const botInfo = checkBot()
+  const botInfo = checkBot();
   if (botInfo) {
-    return botInfo
+    return botInfo;
   }
 
   const browserArr = [
@@ -135,7 +138,11 @@ export const getBrower = (): { browser: string, browserVersion: string, isBot: b
     { s: 'Safari', r: /Safari/, v: /Safari\/([\d\.]+)/ }, // 已测试
     { s: 'Chrome', r: /Chrome|Chromium|CriOS/, v: /[Chrome|Chromium|CriOS]\/([\d\.]+)/ }, // 已测试
     { s: 'IE', r: /MSIE|Trident/, v: /MSIE ([\d\.]+);|rv:([\d\.]+)/ }, // 已测试
-    { s: 'Edge', r: /Edge|Edg\/|EdgA|EdgiOS/, v: /Edge\/([\d\.]+)|Edg\/([\d\.]+)|EdgA\/([\d\.]+)|EdgiOS\/([\d\.]+)/ }, // 已测试
+    {
+      s: 'Edge',
+      r: /Edge|Edg\/|EdgA|EdgiOS/,
+      v: /Edge\/([\d\.]+)|Edg\/([\d\.]+)|EdgA\/([\d\.]+)|EdgiOS\/([\d\.]+)/,
+    }, // 已测试
     { s: 'Firefox', r: /Firefox|FxiOS/, v: /Firefox\/([\d\.]+)|FxiOS\/([\d\.]+)/ }, // 已测试
     { s: 'Chromium', r: /Chromium/, v: /Chromium\/([\d\.]+)/ }, // 只有较老版本的 Chromium 才会包含 Chromium 字段
     { s: 'Opera', r: /Opera|OPR/, v: /Opera\/([\d\.]+)|OPR\/([\d\.]+)/ }, // 已测试
@@ -155,7 +162,11 @@ export const getBrower = (): { browser: string, browserVersion: string, isBot: b
     { s: '360', r: /QihooBrowser|QHBrowser/, v: /QihooBrowser\/([\d\.]+)|QHBrowser\/([\d\.]+)/ },
     { s: '360EE', r: /360EE/, v: /360EE\/([\d\.]+)/ },
     { s: '360SE', r: /360SE/, v: /360SE\/([\d\.]+)/ },
-    { s: 'UC', r: /UCBrowser| UBrowser|UCWEB/, v: /UCBrowser\/([\d\.]+)| UBrowser\/([\d\.]+)|UCWEB\/([\d\.]+)/ }, // 已测试
+    {
+      s: 'UC',
+      r: /UCBrowser| UBrowser|UCWEB/,
+      v: /UCBrowser\/([\d\.]+)| UBrowser\/([\d\.]+)|UCWEB\/([\d\.]+)/,
+    }, // 已测试
     { s: 'QQBrowser', r: /QQBrowser/, v: /QQBrowser\/([\d\.]+)/ }, // 已测试
     { s: 'Sogou', r: /MetaSr|Sogou/, v: /MetaSr\s([\d\.]+)|SogouMobileBrowser\/([\d\.]+)/ }, // 已测试
     { s: 'Quark', r: /Quark/, v: /Quark\/([\d\.]+)/ }, // 已测试
@@ -163,91 +174,98 @@ export const getBrower = (): { browser: string, browserVersion: string, isBot: b
     { s: 'TheWorld', r: /TheWorld/, v: /TheWorld ([\d\.]+)/ }, // 已测试
     // 手机厂商
     { s: 'MiuiBrowser', r: /MiuiBrowser/, v: /MiuiBrowser\/([\d\.]+)/ }, // 已测试
-    { s: 'HuaweiBrowser', r: /HuaweiBrowser|HUAWEI\/|HBPC\//, v: /HuaweiBrowser\/([\d\.]+)|HUAWEI\/([\d\.]+)|HBPC\/([\d\.]+)/ },
+    {
+      s: 'HuaweiBrowser',
+      r: /HuaweiBrowser|HUAWEI\/|HBPC\//,
+      v: /HuaweiBrowser\/([\d\.]+)|HUAWEI\/([\d\.]+)|HBPC\/([\d\.]+)/,
+    },
     { s: 'HONOR', r: /HONOR\//, v: /HONOR\/([\d\.]+)/ },
     { s: 'VivoBrowser', r: /VivoBrowser/, v: /VivoBrowser\/([\d\.]+)/ },
     { s: 'OPPOBrowser', r: /HeyTapBrowser/, v: /HeyTapBrowser\/([\d\.]+)/ },
     // 应用容器
     { s: 'QQ', r: /QQ\//, v: /QQ\/([\d\.]+)/ },
-    { s: 'Baidu', r: /Baidu|BIDUBrowser|baidubrowser|baiduboxapp|BaiduHD/, v: /BIDUBrowser[\s\/]([\d\.]+)|baidubrowser[\s\/]([\d\.]+)|baiduboxapp\/([\d\.]+)|BaiduHD\/([\d\.]+)/ },
+    {
+      s: 'Baidu',
+      r: /Baidu|BIDUBrowser|baidubrowser|baiduboxapp|BaiduHD/,
+      v: /BIDUBrowser[\s\/]([\d\.]+)|baidubrowser[\s\/]([\d\.]+)|baiduboxapp\/([\d\.]+)|BaiduHD\/([\d\.]+)/,
+    },
     { s: 'Weibo', r: /Weibo/, v: /Weibo__([\d\.]+)/ },
     { s: 'Douban', r: /com.douban.frodo/, v: /com.douban.frodo\/([\d\.]+)/ },
     { s: 'Douyin', r: /aweme/, v: /aweme\/([\d\.]+)/ },
     { s: 'Toutiao', r: /NewsArticle/, v: /NewsArticle\/([\d\.]+)/ },
     { s: 'Taobao', r: /AliApp\(TB/, v: /AliApp\(TB\/([\d\.]+)/ },
-    { s: 'uTools', r: /uTools/, v: /uTools\/([\d\.]+)/ }
-
-  ]
+    { s: 'uTools', r: /uTools/, v: /uTools\/([\d\.]+)/ },
+  ];
 
   for (let i = browserArr.length - 1; i >= 0; i--) {
-    const iterator = browserArr[i]
+    const iterator = browserArr[i];
     if (iterator.r.test(ua)) {
-      const matches = iterator.v.exec(ua)
-      browser = iterator.s
-      browserVersion = matches ? (matches[1] || matches[0]?.split('/')[1]) : ''
-      break
+      const matches = iterator.v.exec(ua);
+      browser = iterator.s;
+      browserVersion = matches ? matches[1] || matches[0]?.split('/')[1] : '';
+      break;
     }
   }
 
   // 阿里环境判断
-  const alipayMatches = ua.match(/\s*AlipayClient\/([\d\.]+)/i)
+  const alipayMatches = ua.match(/\s*AlipayClient\/([\d\.]+)/i);
   if (alipayMatches) {
     if (ua.includes('DingTalk')) {
-      browser = 'DingTalk'
+      browser = 'DingTalk';
     } else if (ua.includes('AlipayIDE')) {
-      browser = 'AlipayIDE'
+      browser = 'AlipayIDE';
     } else if (ua.includes('MiniProgram')) {
-      browser = 'AliMP'
+      browser = 'AliMP';
     } else {
-      browser = 'AlipayClient'
+      browser = 'AlipayClient';
     }
-    browserVersion = alipayMatches[1] || '0.0.0'
+    browserVersion = alipayMatches[1] || '0.0.0';
   }
   // 微信环境判断
-  const wechatMatches = ua.match(/\s*MicroMessenger\/([\d\.]+)/i)
+  const wechatMatches = ua.match(/\s*MicroMessenger\/([\d\.]+)/i);
   if (wechatMatches) {
     if (ua.includes('wechatdevtools')) {
-      browser = 'WechatIDE'
+      browser = 'WechatIDE';
     } else if (ua.includes('miniProgram')) {
-      browser = 'WechatMP'
+      browser = 'WechatMP';
     } else if (ua.includes('wxwork')) {
-      browser = 'WechatWork'
+      browser = 'WechatWork';
     } else {
-      browser = 'WechatClient'
+      browser = 'WechatClient';
     }
 
-    browserVersion = wechatMatches[1] || '0.0.0'
+    browserVersion = wechatMatches[1] || '0.0.0';
   }
   // utools 环境判断
-  const utoolsMatches = ua.match(/\s*uTools\/([\d\.]+)/i)
+  const utoolsMatches = ua.match(/\s*uTools\/([\d\.]+)/i);
   if (utoolsMatches) {
-    browser = 'uTools'
-    browserVersion = utoolsMatches[1]
+    browser = 'uTools';
+    browserVersion = utoolsMatches[1];
   }
 
   return {
     browser,
     browserVersion,
     isBot,
-    isWebview
-  }
-}
+    isWebview,
+  };
+};
 
 // 获取设备类型
-export const getDeviceType = (): string => {
+export const getDeviceType = () => {
   const typeArr = [
-    { s: 'Mobile', r: /Mobi|iPh|480/ },
-    { s: 'Tablet', r: /Tablet|Nexus 7/ },
-    { s: 'iPad', r: /iPad/ }
-  ]
+    { s: DeviceType.Mobile, r: /Mobi|iPh|480/ },
+    { s: DeviceType.Tablet, r: /Tablet|Nexus 7/ },
+    { s: DeviceType.iPad, r: /iPad/ },
+  ];
 
   for (const iterator of typeArr) {
     if (iterator.r.test(ua)) {
-      return iterator.s
+      return iterator.s;
     }
   }
-  return 'Desktop'
-}
+  return DeviceType.Desktop;
+};
 
 // 判断浏览器内核
 export const getBrowerEngine = (): string => {
@@ -257,39 +275,44 @@ export const getBrowerEngine = (): string => {
     { s: 'WebKit', r: /AppleWebKit/ },
     { s: 'Gecko', r: /Gecko\/|Trident\/|Firefox\/|rv:/ },
     { s: 'Blink', r: /Chrome|Chromium|CriOS/ },
-    { s: 'KHTML', r: /KHTML/ }
-  ]
+    { s: 'KHTML', r: /KHTML/ },
+  ];
 
   for (const iterator of engineArr) {
     if (iterator.r.test(ua)) {
-      return iterator.s
+      return iterator.s;
     }
   }
-  return 'Unknow'
-}
+  return 'Unknow';
+};
 
 // 获取屏幕方向
 export const getOrientation = (): string => {
-  const orientation = window.screen.orientation
-  const res = orientation.type.startsWith('portrait') ? 'portrait' : 'landscape'
-  return res
-}
+  const orientation = window.screen.orientation;
+  const res = orientation.type.startsWith('portrait') ? 'portrait' : 'landscape';
+  return res;
+};
 
 // 获取屏幕信息
 export const getScreenInfo = () => {
   return {
-    screenWidth: window.screen.width,
-    screenHeight: window.screen.height,
-    viewportWidth: window.innerWidth,
-    viewportHeight: window.innerHeight
-  }
-}
+    screenWidth: window?.screen?.width || 0,
+    screenHeight: window?.screen?.height || 0,
+    viewportWidth: window?.innerWidth || 0,
+    viewportHeight: window?.innerHeight || 0,
+  };
+};
 
 // 获取移动端设备品牌和型号
 // TODO 不准确
 export const getMobileModel = () => {
-  let brand = 'unknown'
-  let model = 'unknown'
+  let brand = 'unknown';
+  let model = 'unknown';
+
+  if (getDeviceType() === DeviceType.Desktop) {
+    brand = '';
+    model = '';
+  }
 
   const androidBrandArr = [
     { s: 'Huawei', r: /huawei/ },
@@ -315,53 +338,57 @@ export const getMobileModel = () => {
     { s: 'BlackBerry', r: /blackberry/ },
     { s: 'Nokia', r: /nokia/ },
     { s: 'Microsoft', r: /microsoft/ },
-    { s: 'Panasonic', r: /panasonic/ }
-  ]
+    { s: 'Panasonic', r: /panasonic/ },
+  ];
 
-  if (ua.match(/iPhone/i)) { // iPhone
-    brand = 'iPhone'
-    const matches = /Mobile\/([\dA-Z]+)/.exec(ua)
-    model = matches ? matches[1] : 'unknown'
-  } else if (ua.match(/iPad/i)) { // iPad
-    brand = 'iPad'
-    const matches = /Mobile\/([\dA-Z]+)/.exec(ua)
-    model = matches ? matches[1] : 'unknown'
-  } else if (ua.match(/Tablet/i)) { // Android tablets
-    model = 'Android tablet'
-    brand = 'unknown'
+  if (ua.match(/iPhone/i)) {
+    // iPhone
+    brand = 'iPhone';
+    const matches = /Mobile\/([\dA-Z]+)/.exec(ua);
+    model = matches ? matches[1] : 'unknown';
+  } else if (ua.match(/iPad/i)) {
+    // iPad
+    brand = 'iPad';
+    const matches = /Mobile\/([\dA-Z]+)/.exec(ua);
+    model = matches ? matches[1] : 'unknown';
+  } else if (ua.match(/Tablet/i)) {
+    // Android tablets
+    model = 'Android tablet';
+    brand = 'unknown';
     androidBrandArr.forEach((item) => {
       if (item.r.test(ua.toLowerCase())) {
-        brand = item.s
+        brand = item.s;
       }
-    })
-    const regInfo = ua.match(/\((.*?)\)/)
-    const info = regInfo ? regInfo[1] : ''
-    const arr = info.split(';').reverse()
+    });
+    const regInfo = ua.match(/\((.*?)\)/);
+    const info = regInfo ? regInfo[1] : '';
+    const arr = info.split(';').reverse();
     arr.forEach((item) => {
       if (item.includes('Build/')) {
-        model = item.trim()
+        model = item.trim();
       }
-    })
-  } else if (ua.match(/Android/i)) { // Android phones
-    model = 'Android phone'
-    brand = 'unknown'
+    });
+  } else if (ua.match(/Android/i)) {
+    // Android phones
+    model = 'Android phone';
+    brand = 'unknown';
     androidBrandArr.forEach((item) => {
       if (item.r.test(ua.toLowerCase())) {
-        brand = item.s
+        brand = item.s;
       }
-    })
-    const regInfo = ua.match(/\((.*?)\)/)
-    const info = regInfo ? regInfo[1] : ''
-    const arr = info.split(';').reverse()
+    });
+    const regInfo = ua.match(/\((.*?)\)/);
+    const info = regInfo ? regInfo[1] : '';
+    const arr = info.split(';').reverse();
     arr.forEach((item) => {
       if (item.includes('Build/')) {
-        model = item
+        model = item;
       }
-    })
+    });
   }
 
   return {
     mobileBrand: brand,
-    mobileModel: model
-  }
-}
+    mobileModel: model,
+  };
+};

@@ -9,8 +9,7 @@ import serve from 'rollup-plugin-serve';
 import { DEFAULT_EXTENSIONS } from "@babel/core";
 import pkg from "./package.json" assert { type: 'json' }; // 读取 package.json 配置
 const env = process.env.NODE_ENV; // 当前运行环境，可通过 cross-env 命令行设置
-const name = "FantaFrontendMonitorReport"; // 导出的全局变量名称
-
+const name = "FantaReport"; // 导出的全局变量名称
 const config = {
   input: "src/main.ts",
   output: [
