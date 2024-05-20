@@ -1,5 +1,6 @@
 import log from './log'
 import Store from '../common/store'
+import { REPORT_REQUIRED_FIELDS } from '../common/constant'
 
 import { type IBaseInfo, type ITrackEvent, type InitParams } from '../types'
 
@@ -44,6 +45,17 @@ export const sendReport = async (reportData: InitParams & IBaseInfo & ITrackEven
   const reportHost = Store.getData('reportHost')
   if (!reportHost) {
     log.error('reportHost is empty')
+  }
+  const requiredParams = REPORT_REQUIRED_FIELDS || []
+  const keys = Object.keys(reportData)
+  const hasRequired = keys.filter(it => requiredParams.includes(it)).some(i =>
+    reportData[i] === undefined || reportData[i] === null || reportData[i] === '')
+
+  console.log('hasRequired', hasRequired)
+
+  if (hasRequired) {
+    log.error('reportData has required fields that are empty')
+    return
   }
 
   try {
