@@ -1,5 +1,6 @@
 import { type IBaseInfo, type InitParams } from '../types'
-import { getBaseInfo, generateUuid, getGeoInfo, getIpAddress, getNetwork } from '../h5/h5BaseInfo'
+import { getBaseInfo, generateUuid, getGeoInfo, getIpAddress, getNetwork, getFingerPrint } from '../h5/h5BaseInfo'
+import log from './log'
 
 const initState: InitParams & IBaseInfo = {
   // 本地数据
@@ -39,7 +40,10 @@ const initState: InitParams & IBaseInfo = {
   pagePath: '',
   pageOrigin: '',
   pageSearch: '',
-  pageProtocol: ''
+  pageProtocol: '',
+  fingerPrintAudio: '',
+  fingerPrintCanvas: '',
+  fingerPrintWebgl: '',
 }
 
 const Store = {
@@ -50,6 +54,7 @@ const Store = {
     this.setGeoInfo()
     this.setIp()
     this.setNetwork()
+    this.setFingerPrint()
   },
   getData (key?: string) {
     if (key) {
@@ -80,13 +85,17 @@ const Store = {
   setGeoInfo () {
     getGeoInfo().then((coordinates) => {
       this.state.coordinates = coordinates
-    }, () => {})
+    }, () => {
+      log.error('get geo info error')
+    })
   },
   setIp () {
     getIpAddress().then((ip) => {
       this.state.ip = ip
       this.setReady(true)
-    }, () => {})
+    }, () => {
+      log.error('get ip error')
+    })
   },
   setNetwork () {
     getNetwork().then(({
@@ -95,7 +104,9 @@ const Store = {
     }) => {
       this.state.networkType = networkType
       this.state.networkEffectiveType = networkEffectiveType
-    }, () => {})
+    }, () => {
+      log.error('get network error')
+    })
   },
   setSdkInfo (version: string, buildTime: string, env: string) {
     this.state.sdkVersion = version
@@ -113,7 +124,20 @@ const Store = {
   },
   setReady (ready: boolean) {
     this.state.isReady = ready
-  }
+  },
+  setFingerPrint () {
+    getFingerPrint().then(({
+      fingerPrintAudio,
+      fingerPrintCanvas,
+      fingerPrintWebgl,
+    }) => {
+      this.state.fingerPrintAudio = fingerPrintAudio
+      this.state.fingerPrintCanvas = fingerPrintCanvas
+      this.state.fingerPrintWebgl = fingerPrintWebgl
+    }, () => {
+      log.error('get finger print error')
+    })
+  },
 }
 
 export default Store

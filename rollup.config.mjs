@@ -9,6 +9,7 @@ import serve from 'rollup-plugin-serve';
 import { DEFAULT_EXTENSIONS } from '@babel/core';
 import pkg from './package.json' assert { type: 'json' }; // 读取 package.json 配置
 import replace from '@rollup/plugin-replace';
+
 const env = process.env.NODE_ENV; // 当前运行环境，可通过 cross-env 命令行设置
 const name = 'FantaReport'; // 导出的全局变量名称
 const config = {
@@ -69,13 +70,13 @@ if (env === 'pro') {
 
 // 测试环境才需要服务
 if (env !== 'pro') {
-  config.plugins.push(
+  config.plugins.push([
     serve({
       contentBase: ['example', 'dist'],
       port: 3388,
       open: true,
-    })
-  );
+    }),
+  ]);
 }
 
 export default config;

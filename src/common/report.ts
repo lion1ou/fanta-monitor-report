@@ -51,8 +51,6 @@ export const sendReport = async (reportData: InitParams & IBaseInfo & ITrackEven
   const hasRequired = keys.filter(it => requiredParams.includes(it)).some(i =>
     reportData[i] === undefined || reportData[i] === null || reportData[i] === '')
 
-  console.log('hasRequired', hasRequired)
-
   if (hasRequired) {
     log.error('reportData has required fields that are empty')
     return

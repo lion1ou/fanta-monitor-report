@@ -3,6 +3,9 @@ import { getIp, getNetworkType, getGeo, uuid } from './other'
 import { getLocation } from './location'
 import { type IBaseInfo } from '../../types/index'
 import log from '../../common/log'
+import audioFP from '../../fingerprinting/audioFP'
+import canvasFP from '../../fingerprinting/canvasFP'
+import webglFP from '../../fingerprinting/webglFP'
 
 export const getBaseInfo = (): IBaseInfo => {
   const { userAgent, language } = window.navigator
@@ -15,6 +18,7 @@ export const getBaseInfo = (): IBaseInfo => {
   const { mobileBrand, mobileModel } = getMobileModel()
 
   const { pagePath, pageOrigin, pageSearch, pageProtocol } = getLocation()
+
   const result = {
     userAgent, // 浏览器信息
     deviceType, // 设备类型
@@ -39,6 +43,24 @@ export const getBaseInfo = (): IBaseInfo => {
     pageProtocol
   }
   log.info('getBaseInfo', result)
+  return result
+}
+
+export const getFingerPrint = async (): Promise<any> => {
+  const [audioFPRes, canvasFPRes] = await Promise.all([
+    audioFP(),
+    canvasFP(),
+  ])
+  const fingerPrintAudio = audioFPRes.hash
+  const fingerPrintCanvas = canvasFPRes.hash
+  const fingerPrintWebgl = webglFP()?.hash
+
+  const result = {
+    fingerPrintAudio,
+    fingerPrintCanvas,
+    fingerPrintWebgl,
+  }
+  log.info('getFingerPrint', result)
   return result
 }
 
