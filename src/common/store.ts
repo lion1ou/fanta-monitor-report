@@ -41,9 +41,8 @@ const initState: InitParams & IBaseInfo = {
   pageOrigin: '',
   pageSearch: '',
   pageProtocol: '',
-  fingerPrintAudio: '',
-  fingerPrintCanvas: '',
-  fingerPrintWebgl: '',
+  fingerPrint: '', // canvas指纹 + UA = 浏览器指纹
+  fingerPrintCanvas: '', // canvas指纹
 }
 
 const Store = {
@@ -127,13 +126,11 @@ const Store = {
   },
   setFingerPrint () {
     getFingerPrint().then(({
-      fingerPrintAudio,
       fingerPrintCanvas,
-      fingerPrintWebgl,
+      fingerPrint
     }) => {
-      this.state.fingerPrintAudio = fingerPrintAudio
       this.state.fingerPrintCanvas = fingerPrintCanvas
-      this.state.fingerPrintWebgl = fingerPrintWebgl
+      this.state.fingerPrint = fingerPrint
     }, () => {
       log.error('get finger print error')
     })
