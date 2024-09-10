@@ -1,6 +1,6 @@
 {
   "name": "fanta-monitor-report",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "fanta is a frontend monitor report sdk",
   "main": "dist/bundle.js",
   "module": "dist/bundle.es.js",
