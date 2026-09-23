@@ -77,6 +77,23 @@ export type BotsMode = (typeof BOTS_MODES)[number]
 
 export type Granularity = 'hour' | 'day'
 
+// 人工标记访客的统计口径：exclude 不计入 is_excluded 的访客（默认），include 全部计入
+export const TAGGED_MODES = ['exclude', 'include'] as const
+export type TaggedMode = (typeof TAGGED_MODES)[number]
+
+// 维度下钻：所有统计接口可选的精确匹配过滤
+export const DIMENSION_KEYS = ['path', 'referrerHost', 'browser', 'os', 'deviceType', 'country', 'province', 'city', 'language'] as const
+export type DimensionKey = (typeof DIMENSION_KEYS)[number]
+export type DimensionFilters = Partial<Record<DimensionKey, string>>
+
+export interface VisitorTag {
+  visitorKey: string
+  label: string
+  isExcluded: boolean
+  note: string
+  updatedAt: string
+}
+
 export const VITAL_METRICS = ['lcp', 'fcp', 'cls', 'inp', 'fid', 'ttfb', 'load', 'domReady'] as const
 export type VitalMetric = (typeof VITAL_METRICS)[number]
 
@@ -99,6 +116,9 @@ export interface StatsKpi {
   errorRate: number
   botPv: number
   totalPv: number
+  bounceRate: number // 只有 1 次 PageView 的会话占比
+  avgVisitDuration: number // 会话内首末事件间隔的平均值，秒
+  excludedVisitors: number // 区间内因人工标记被排除的访客数
 }
 
 export interface OverviewStats {
@@ -112,6 +132,7 @@ export interface PagesStats {
   paths: Array<{ path: string, pv: number, uv: number }>
   entries: Array<{ path: string, sessions: number }>
   referrers: Array<{ host: string, sessions: number }>
+  hosts: Array<{ host: string, pv: number, uv: number }> // page_origin，多域名/多环境部署时区分
 }
 
 export interface Distribution {
@@ -210,12 +231,50 @@ export interface EventRow {
   os: string
   botVerdict: BotVerdict
   geo: GeoRegion
+  tag: VisitorTag | null
   trackData: Record<string, unknown>
 }
 
 export interface EventsPage {
   total: number
   items: EventRow[]
+}
+
+// 区间内某访客的汇总；geo / browser / os / deviceType 取最近一次事件
+export interface VisitorSummary {
+  visitorKey: string
+  tag: VisitorTag | null
+  firstSeen: string
+  lastSeen: string
+  sessions: number
+  pv: number
+  userIds: string[]
+  geo: GeoRegion
+  browser: string
+  os: string
+  deviceType: string
+}
+
+export interface VisitorsStats {
+  visitors: VisitorSummary[]
+}
+
+export interface VisitorDetail {
+  profile: VisitorSummary & { lifetimeFirstSeen: string, lifetimeSessions: number, apps: string[] }
+  events: EventRow[]
+}
+
+// 跨项目总览：每个 app 一组 KPI 与序列，序列只含 PV/UV
+export interface GlobalStats {
+  granularity: Granularity
+  apps: Array<{ app: string, current: StatsKpi, previous: StatsKpi, series: Array<{ bucket: string, pv: number, uv: number }> }>
+}
+
+export interface SourcesStats {
+  referrers: Array<{ host: string, sessions: number }>
+  utmSource: Distribution[]
+  utmMedium: Distribution[]
+  utmCampaign: Distribution[]
 }
 
 export const trackBatchSchema = {

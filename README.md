@@ -63,7 +63,7 @@ npm run build && npm start -w packages/server   # 生产：http://localhost:5001
 </script>
 ```
 
-`initReport` 参数：`reportHost`、`appName` 必填；`appVersion`、`userId`、`debug`、`enableGeo=false`、`autoTrack={ pageView, error, performance }`（默认全开）、`batchSize=10`、`flushInterval=5000`、`enableImgFallback=true`。
+`initReport` 参数：`reportHost`、`appName` 必填；`appVersion`、`userId`、`debug`、`enableGeo=false`、`autoTrack={ pageView, error, performance }`（默认全开）、`batchSize=10`、`flushInterval=5000`、`enableImgFallback=true`、`cookieDomain`（访客 id cookie `fanta_uid` 的 Domain，缺省取主机名末两段，如 `jz.lion1ou.tech` → `.lion1ou.tech`，同主域站点共享同一访客；localhost/IP 不写 cookie，仅用 localStorage）。
 
 方法：`pageView / click / error / custom(data?)`、`setUserId(userId)`、`flush()`。
 

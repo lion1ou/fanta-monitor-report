@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatNumber, formatPercent, formatDelta, formatMs, formatMetric, formatRegion } from '../src/lib/format'
+import { formatNumber, formatPercent, formatDelta, formatMs, formatMetric, formatRegion, formatDuration } from '../src/lib/format'
 
 describe('format', () => {
   it('formatNumber 千分位', () => {
@@ -10,6 +10,13 @@ describe('format', () => {
   it('formatPercent 一位小数', () => {
     expect(formatPercent(0.1234)).toBe('12.3%')
     expect(formatPercent(0)).toBe('0.0%')
+  })
+
+  it('formatDuration 秒转分秒', () => {
+    expect(formatDuration(0)).toBe('0s')
+    expect(formatDuration(45.4)).toBe('45s')
+    expect(formatDuration(1200)).toBe('20m 00s')
+    expect(formatDuration(65)).toBe('1m 05s')
   })
 
   it('formatDelta 环比', () => {

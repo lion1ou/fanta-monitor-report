@@ -1,4 +1,4 @@
-import type { BotVerdict, DevicesStats, GeoRegion } from '@fanta/shared'
+import type { BotVerdict, DevicesStats, DimensionKey, GeoRegion } from '@fanta/shared'
 import type { PageProps } from '../App'
 import { useStats } from '../hooks/useStats'
 import { formatNumber, formatPercent } from '../lib/format'
@@ -14,13 +14,14 @@ const GEO_LEVELS: Array<{ key: keyof GeoRegion, title: string }> = [
   { key: 'city', title: '城市' }
 ]
 
-const DIMENSIONS: Array<{ key: keyof Omit<DevicesStats, 'bots' | 'geo'>, title: string }> = [
-  { key: 'deviceType', title: '设备类型' },
-  { key: 'os', title: '操作系统' },
-  { key: 'browser', title: '浏览器' },
-  { key: 'screen', title: '屏幕分辨率' },
-  { key: 'network', title: '网络类型' },
-  { key: 'language', title: '语言' }
+// filterKey 为空的维度不支持下钻（服务端没有对应过滤表达式）
+const DIMENSIONS: Array<{ key: keyof Omit<DevicesStats, 'bots' | 'geo'>, title: string, filterKey: DimensionKey | null }> = [
+  { key: 'deviceType', title: '设备类型', filterKey: 'deviceType' },
+  { key: 'os', title: '操作系统', filterKey: 'os' },
+  { key: 'browser', title: '浏览器', filterKey: 'browser' },
+  { key: 'screen', title: '屏幕分辨率', filterKey: null },
+  { key: 'network', title: '网络类型', filterKey: null },
+  { key: 'language', title: '语言', filterKey: 'language' }
 ]
 
 export const VERDICT_LABELS: Record<BotVerdict, string> = {
@@ -30,24 +31,24 @@ export const VERDICT_LABELS: Record<BotVerdict, string> = {
   none: '真实访客'
 }
 
-export const Devices = ({ filters, reloadKey }: PageProps) => {
+export const Devices = ({ filters, reloadKey, onFilter }: PageProps) => {
   const { data, loading, error } = useStats<DevicesStats>(filters.app ? '/devices' : null, scopeParams(filters), reloadKey)
   return (
     <>
-      <PageHead title="访客与设备" filters={filters} />
+      <PageHead title="设备与地域" filters={filters} />
       {error && <ErrorState message={error} />}
       <BotsPanel bots={data?.bots} loading={loading} />
       <div className="grid grid-3">
         {GEO_LEVELS.map((level) => (
-          <Card key={level.key} title={level.title} hint="按访问 IP 解析，内网与未知单列" ariaLabel={level.title}>
-            <DistributionList rows={data?.geo[level.key] ?? []} loading={loading} />
+          <Card key={level.key} title={level.title} hint="按访问 IP 解析，内网与未知单列；点击下钻" ariaLabel={level.title}>
+            <DistributionList rows={data?.geo[level.key] ?? []} loading={loading} onSelect={(value) => { onFilter({ [level.key]: value }); }} />
           </Card>
         ))}
       </div>
       <div className="grid grid-3">
         {DIMENSIONS.map((dim) => (
-          <Card key={dim.key} title={dim.title} hint="按 PageView 统计，UV 排序">
-            <DistributionList rows={data?.[dim.key] ?? []} loading={loading} />
+          <Card key={dim.key} title={dim.title} hint={dim.filterKey ? '按 PageView 统计，UV 排序；点击下钻' : '按 PageView 统计，UV 排序'} ariaLabel={dim.title}>
+            <DistributionList rows={data?.[dim.key] ?? []} loading={loading} onSelect={dim.filterKey ? (value) => { onFilter({ [dim.filterKey as DimensionKey]: value }); } : undefined} />
           </Card>
         ))}
       </div>

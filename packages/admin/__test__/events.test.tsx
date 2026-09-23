@@ -3,15 +3,14 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Events } from '../src/pages/Events'
 import { Errors } from '../src/pages/Errors'
-import type { Filters } from '../src/state/filters'
-import { errorsFixture, eventsFixture, mockStatsFetch } from './fixtures'
+import { errorsFixture, eventsFixture, mockStatsFetch, filtersFixture, pageProps } from './fixtures'
 
-const filters: Filters = { app: 'demo', preset: '7d', bots: 'exclude', from: Date.parse('2026-09-16T00:00:00Z'), to: Date.parse('2026-09-22T12:00:00Z') }
+const filters = filtersFixture
 
 describe('事件明细板块', () => {
   it('分页按钮改变 offset 并重新请求', async () => {
     const fetchMock = mockStatsFetch({ '/events': (url: URL) => eventsFixture(Number(url.searchParams.get('offset') ?? 0)) })
-    render(<Events filters={filters} reloadKey={0} />)
+    render(<Events filters={filters} {...pageProps} />)
     expect(await screen.findByText('/p0')).toBeInTheDocument()
     expect(screen.getByText('共 120 条 · 第 1–50 条')).toBeInTheDocument()
 
@@ -24,7 +23,7 @@ describe('事件明细板块', () => {
 
   it('地域列：省·市、内网与未知', async () => {
     mockStatsFetch({ '/events': (url: URL) => eventsFixture(Number(url.searchParams.get('offset') ?? 0)) })
-    render(<Events filters={filters} reloadKey={0} />)
+    render(<Events filters={filters} {...pageProps} />)
     expect(await screen.findByText('/p0')).toBeInTheDocument()
     const rows = screen.getAllByRole('row')
     expect(within(rows[1]).getByText('广东省 · 深圳市')).toBeInTheDocument()
@@ -34,7 +33,7 @@ describe('事件明细板块', () => {
 
   it('类型过滤带入请求，点击行展开 trackData', async () => {
     const fetchMock = mockStatsFetch({ '/events': (url: URL) => eventsFixture(Number(url.searchParams.get('offset') ?? 0)) })
-    render(<Events filters={filters} reloadKey={0} />)
+    render(<Events filters={filters} {...pageProps} />)
     await screen.findByText('/p0')
     await userEvent.selectOptions(screen.getByLabelText('事件类型'), 'Error')
     expect(String(fetchMock.mock.calls.at(-1)?.[0])).toContain('type=Error')
@@ -50,7 +49,7 @@ describe('错误板块', () => {
       '/errors': errorsFixture,
       '/errors/occurrences': { items: [{ trackId: 'x', trackTime: '2026-09-21T01:00:00.000Z', path: '/pricing', browser: 'Chrome', browserVersion: '120', os: 'Mac OS X', osVersion: '14', userId: 'u1', visitor: 'fpA', trackData: { stack: 'Error: boom\n  at a.js:1' } }] }
     })
-    render(<Errors filters={filters} reloadKey={0} />)
+    render(<Errors filters={filters} {...pageProps} />)
     const row = await screen.findByText('boom')
     expect(within(screen.getByRole('region', { name: '错误数' })).getByText('12')).toBeInTheDocument()
     await userEvent.click(row)

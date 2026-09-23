@@ -17,6 +17,7 @@ export interface InitParams {
   batchSize?: number
   flushInterval?: number
   enableImgFallback?: boolean
+  cookieDomain?: string // 访客 id cookie 的 Domain；缺省取主机名末两段，同主域站点共享访客
 }
 
 // 填充默认值后的配置
@@ -31,6 +32,7 @@ export interface SdkConfig {
   batchSize: number
   flushInterval: number
   enableImgFallback: boolean
+  cookieDomain?: string
 }
 
 // 页面信息，每次上报时实时读取

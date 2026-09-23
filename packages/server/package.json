@@ -11,6 +11,7 @@
     "backfill:bots": "tsx --env-file=.env scripts/backfill-bots.ts",
     "geo:download": "tsx --env-file=.env scripts/download-geo.ts",
     "backfill:geo": "tsx --env-file=.env scripts/backfill-geo.ts",
+    "backfill:utm": "tsx --env-file=.env scripts/backfill-utm.ts",
     "test": "vitest run"
   },
   "devDependencies": {

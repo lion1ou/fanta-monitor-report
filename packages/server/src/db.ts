@@ -46,17 +46,25 @@ const COLUMNS: Array<[column: string, field: keyof TrackEvent, pgType: string]> 
   ['coordinates', 'coordinates', 'text']
 ]
 
-// 服务端派生列：爬虫判定、webdriver 标记与按 client_ip 解析的地域，随事件一起写入
+export interface UtmParams { utmSource: string, utmMedium: string, utmCampaign: string }
+
+// 从页面 search 解析 UTM 三项；缺失或不可解析为空串
+export const parseUtm = (pageSearch: string | undefined): UtmParams => {
+  const params = new URLSearchParams(pageSearch ?? '')
+  return { utmSource: params.get('utm_source') ?? '', utmMedium: params.get('utm_medium') ?? '', utmCampaign: params.get('utm_campaign') ?? '' }
+}
+
+// 服务端派生列：爬虫判定、webdriver 标记、按 client_ip 解析的地域与 UTM，随事件一起写入
 const INSERT_SQL = `
-INSERT INTO track_events (track_time, client_ip, geo_country, geo_province, geo_city, bot_verdict, is_webdriver, ${COLUMNS.map(([column]) => column).join(', ')})
-SELECT to_timestamp(t."trackTime" / 1000.0), NULLIF($2, '')::inet, $3, $4, $5, t."botVerdict", COALESCE(t."isWebdriver", false), ${COLUMNS.map(([, field]) => `t."${field}"`).join(', ')}
-FROM jsonb_to_recordset($1::jsonb) AS t("trackTime" bigint, "botVerdict" text, "isWebdriver" boolean, ${COLUMNS.map(([, field, pgType]) => `"${field}" ${pgType}`).join(', ')})
+INSERT INTO track_events (track_time, client_ip, geo_country, geo_province, geo_city, bot_verdict, is_webdriver, utm_source, utm_medium, utm_campaign, ${COLUMNS.map(([column]) => column).join(', ')})
+SELECT to_timestamp(t."trackTime" / 1000.0), NULLIF($2, '')::inet, $3, $4, $5, t."botVerdict", COALESCE(t."isWebdriver", false), t."utmSource", t."utmMedium", t."utmCampaign", ${COLUMNS.map(([, field]) => `t."${field}"`).join(', ')}
+FROM jsonb_to_recordset($1::jsonb) AS t("trackTime" bigint, "botVerdict" text, "isWebdriver" boolean, "utmSource" text, "utmMedium" text, "utmCampaign" text, ${COLUMNS.map(([, field, pgType]) => `"${field}" ${pgType}`).join(', ')})
 ON CONFLICT (app_name, track_id) DO NOTHING
 RETURNING 1`
 
 // 一条 SQL 写入整批；(app_name, track_id) 已存在的事件跳过；返回实际写入条数
 export const insertTrackEvents = async (pool: Pool, events: TrackEvent[], clientIp: string, geo: GeoRegion): Promise<number> => {
-  const rows = events.map((event) => ({ ...event, botVerdict: classifyBot(event) }))
+  const rows = events.map((event) => ({ ...event, botVerdict: classifyBot(event), ...parseUtm(event.pageSearch) }))
   const { rowCount } = await pool.query(INSERT_SQL, [JSON.stringify(rows), clientIp, geo.country, geo.province, geo.city])
   return rowCount ?? 0
 }

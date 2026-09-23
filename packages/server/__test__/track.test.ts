@@ -59,6 +59,18 @@ describe('POST /v1/track', () => {
     ])
   })
 
+  it('从 pageSearch 解析 UTM 三列写入；visitor_key 取 uuid、无 uuid 时取指纹', async () => {
+    await postBatch([
+      makeEvent({ trackId: 'utm', pageSearch: '?utm_source=wechat&utm_medium=social&utm_campaign=%E6%98%A5%E8%8A%82&x=1' }),
+      makeEvent({ trackId: 'plain', pageSearch: '', uuid: '', fingerPrint: 'fp-only' })
+    ])
+    const { rows } = await pool.query('SELECT track_id, utm_source, utm_medium, utm_campaign, visitor_key FROM track_events ORDER BY track_id')
+    expect(rows).toEqual([
+      { track_id: 'plain', utm_source: '', utm_medium: '', utm_campaign: '', visitor_key: 'fp-only' },
+      { track_id: 'utm', utm_source: 'wechat', utm_medium: 'social', utm_campaign: '春节', visitor_key: 'uuid-1' }
+    ])
+  })
+
   it('track_time 按客户端毫秒时间戳写入', async () => {
     await postBatch([makeEvent({ trackTime: 1_700_000_000_000 })])
     const { rows } = await pool.query('SELECT extract(epoch FROM track_time) * 1000 AS ms FROM track_events')

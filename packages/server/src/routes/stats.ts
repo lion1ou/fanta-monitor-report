@@ -7,7 +7,11 @@ import { queryDevices } from '../stats/devices.js'
 import { queryPerformance } from '../stats/performance.js'
 import { queryErrorOccurrences, queryErrors } from '../stats/errors.js'
 import { queryEvents } from '../stats/events.js'
-import { TRACK_TYPES, type TrackType } from '@fanta/shared'
+import { queryGlobal } from '../stats/global.js'
+import { querySources } from '../stats/sources.js'
+import { queryVisitorDetail, queryVisitors } from '../stats/visitors.js'
+import { deleteVisitorTag, upsertVisitorTag } from '../stats/tags.js'
+import { TRACK_TYPES, type TrackType, type VisitorTag } from '@fanta/shared'
 
 export interface StatsRoutesOptions {
   pool: Pool
@@ -41,6 +45,41 @@ export const statsRoutes: FastifyPluginAsync<StatsRoutesOptions> = async (app, {
   app.get('/v1/stats/apps', async () => {
     const { rows } = await pool.query<{ app_name: string }>('SELECT DISTINCT app_name FROM track_events WHERE app_name = ANY($1::text[]) ORDER BY app_name', [[...allowedApps]])
     return { apps: rows.map((row) => row.app_name) }
+  })
+
+  // 跨项目总览：不接受 app 与维度过滤，按白名单内所有 app 分组
+  app.get<{ Querystring: GlobalQuery }>('/v1/stats/global', { schema: { querystring: globalQuerySchema } }, async (request) => {
+    const scope = resolveScope({ ...request.query, app: '*' }, timezone)
+    return await queryGlobal(pool, scope, [...allowedApps])
+  })
+
+  app.get<{ Querystring: StatsQuery }>('/v1/stats/sources', { schema: { querystring: statsQuerySchema } }, async (request, reply) => {
+    const scope = await scopeOf(request, reply)
+    if (!scope) return
+    return await querySources(pool, scope, limitOf(request.query, 20, 50))
+  })
+
+  app.get<{ Querystring: StatsQuery }>('/v1/stats/visitors', { schema: { querystring: statsQuerySchema } }, async (request, reply) => {
+    const scope = await scopeOf(request, reply)
+    if (!scope) return
+    return await queryVisitors(pool, scope, limitOf(request.query, 50, 200))
+  })
+
+  app.get<{ Querystring: StatsQuery, Params: VisitorParams }>('/v1/stats/visitors/:key', { schema: { querystring: statsQuerySchema, params: visitorParamsSchema } }, async (request, reply) => {
+    const scope = await scopeOf(request, reply)
+    if (!scope) return
+    const detail = await queryVisitorDetail(pool, scope, request.params.key, limitOf(request.query, 100, 200))
+    if (!detail) return await reply.code(404).send({ error: 'visitor_not_found' })
+    return detail
+  })
+
+  app.put<{ Params: VisitorParams, Body: TagBody }>('/v1/visitors/:key/tag', { schema: { params: visitorParamsSchema, body: tagBodySchema } }, async (request) => {
+    return await upsertVisitorTag(pool, request.params.key, { note: '', ...request.body })
+  })
+
+  app.delete<{ Params: VisitorParams }>('/v1/visitors/:key/tag', { schema: { params: visitorParamsSchema } }, async (request, reply) => {
+    const deleted = await deleteVisitorTag(pool, request.params.key)
+    return await reply.code(deleted ? 204 : 404).send()
   })
 
   app.get<{ Querystring: StatsQuery }>('/v1/stats/overview', { schema: { querystring: statsQuerySchema } }, async (request, reply) => {
@@ -108,5 +147,29 @@ const eventsQuerySchema = {
   }
 } as const
 
+// 全局总览不带 app，也不带维度过滤
+const { app: _app, ...globalProperties } = statsQuerySchema.properties
+const globalQuerySchema = {
+  type: 'object',
+  required: ['from', 'to'],
+  properties: { from: globalProperties.from, to: globalProperties.to, bots: globalProperties.bots, tagged: globalProperties.tagged }
+} as const
+
+const visitorParamsSchema = { type: 'object', required: ['key'], properties: { key: { type: 'string', minLength: 1, maxLength: 200 } } } as const
+
+const tagBodySchema = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['label', 'isExcluded'],
+  properties: {
+    label: { type: 'string', minLength: 1, maxLength: 50 },
+    isExcluded: { type: 'boolean' },
+    note: { type: 'string', maxLength: 500 }
+  }
+} as const
+
+interface GlobalQuery extends Omit<StatsQuery, 'app'> {}
+interface VisitorParams { key: string }
+type TagBody = Pick<VisitorTag, 'label' | 'isExcluded'> & { note?: string }
 interface OccurrencesQuery extends StatsQuery { kind: string, message: string }
 interface EventsQuery extends StatsQuery { type?: TrackType, q?: string, path?: string, offset?: number }

@@ -39,12 +39,13 @@ const AGENTS_SQL = `SELECT user_agent AS name, count(*)::int AS pv ${ALL_PV} AND
 
 export const queryDevices = async (pool: Pool, scope: Scope): Promise<DevicesStats> => {
   const params = scopeParams(scope)
+  const rangeParams = params.slice(0, 3) // 爬虫面板只用 app + 区间
   const dimensions = Object.keys(DIMENSIONS) as Dimension[]
   const [distributions, totals, verdicts, agents] = await Promise.all([
     Promise.all(dimensions.map(async (key) => await pool.query<Distribution>(DISTRIBUTION_SQL(scope, DIMENSIONS[key]), params))),
-    pool.query<{ real_uv: number, real_pv: number, bot_uv: number, bot_pv: number }>(BOT_TOTALS_SQL, params),
-    pool.query<{ verdict: BotVerdict, pv: number }>(VERDICTS_SQL, params),
-    pool.query<{ name: string, pv: number }>(AGENTS_SQL, params)
+    pool.query<{ real_uv: number, real_pv: number, bot_uv: number, bot_pv: number }>(BOT_TOTALS_SQL, rangeParams),
+    pool.query<{ verdict: BotVerdict, pv: number }>(VERDICTS_SQL, rangeParams),
+    pool.query<{ name: string, pv: number }>(AGENTS_SQL, rangeParams)
   ])
   const { geoCountry, geoProvince, geoCity, ...byDimension } = Object.fromEntries(dimensions.map((key, index) => [key, distributions[index].rows])) as Record<Dimension, Distribution[]>
   const t = totals.rows[0]

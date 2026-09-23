@@ -1,7 +1,12 @@
 import { vi } from 'vitest'
-import type { DevicesStats, ErrorsStats, EventsPage, OverviewStats, PagesStats, PerformanceStats } from '@fanta/shared'
+import type { DevicesStats, ErrorsStats, EventsPage, GlobalStats, OverviewStats, PagesStats, PerformanceStats, SourcesStats, StatsKpi, VisitorDetail, VisitorsStats } from '@fanta/shared'
+import type { Filters } from '../src/state/filters'
 
-const kpi = (pv: number) => ({ pv, uv: Math.ceil(pv / 2), sessions: pv, users: 1, errors: 1, errorRate: pv > 0 ? 1 / pv : 0, botPv: 2, totalPv: pv + 2 })
+export const filtersFixture: Filters = { app: 'demo', preset: '7d', bots: 'exclude', tagged: 'exclude', from: Date.parse('2026-09-16T00:00:00Z'), to: Date.parse('2026-09-22T12:00:00Z') }
+// 页面组件的公共 props（除 filters 外）
+export const pageProps = { reloadKey: 0, onFilter: vi.fn(), visitor: null }
+
+const kpi = (pv: number): StatsKpi => ({ pv, uv: Math.ceil(pv / 2), sessions: pv, users: 1, errors: 1, errorRate: pv > 0 ? 1 / pv : 0, botPv: 2, totalPv: pv + 2, bounceRate: 0.4, avgVisitDuration: 95, excludedVisitors: pv > 0 ? 1 : 0 })
 
 export const overviewFixture: OverviewStats = {
   granularity: 'day',
@@ -15,16 +20,40 @@ export const overviewFixture: OverviewStats = {
 
 export const emptyOverview: OverviewStats = {
   granularity: 'day',
-  current: { pv: 0, uv: 0, sessions: 0, users: 0, errors: 0, errorRate: 0, botPv: 0, totalPv: 0 },
-  previous: { pv: 0, uv: 0, sessions: 0, users: 0, errors: 0, errorRate: 0, botPv: 0, totalPv: 0 },
+  current: kpi(0),
+  previous: kpi(0),
   series: []
 }
 
 export const pagesFixture: PagesStats = {
   paths: [{ path: '/', pv: 800, uv: 400 }, { path: '/pricing', pv: 434, uv: 217 }],
   entries: [{ path: '/', sessions: 900 }],
-  referrers: [{ host: '(direct)', sessions: 600 }, { host: 'google.com', sessions: 300 }]
+  referrers: [{ host: '(direct)', sessions: 600 }, { host: 'google.com', sessions: 300 }],
+  hosts: [{ host: 'https://demo.example.com', pv: 1234, uv: 617 }]
 }
+
+export const globalFixture: GlobalStats = {
+  granularity: 'day',
+  apps: [
+    { app: 'demo', current: kpi(1234), previous: kpi(1000), series: [{ bucket: '2026-09-20T00:00:00.000Z', pv: 400, uv: 200 }, { bucket: '2026-09-21T00:00:00.000Z', pv: 834, uv: 417 }] },
+    { app: 'blog', current: kpi(300), previous: kpi(0), series: [{ bucket: '2026-09-20T00:00:00.000Z', pv: 100, uv: 50 }, { bucket: '2026-09-21T00:00:00.000Z', pv: 200, uv: 100 }] }
+  ]
+}
+
+export const sourcesFixture: SourcesStats = {
+  referrers: [{ host: '(direct)', sessions: 600 }, { host: 'google.com', sessions: 300 }],
+  utmSource: [{ name: 'wechat', uv: 20, pv: 40 }],
+  utmMedium: [{ name: 'social', uv: 20, pv: 40 }],
+  utmCampaign: []
+}
+
+export const visitorsFixture: VisitorsStats = {
+  visitors: [
+    { visitorKey: 'uuid-aaaa-1111', tag: { visitorKey: 'uuid-aaaa-1111', label: '本人', isExcluded: true, note: '', updatedAt: '2026-09-21T01:00:00.000Z' }, firstSeen: '2026-09-20T01:00:00.000Z', lastSeen: '2026-09-21T01:00:00.000Z', sessions: 3, pv: 12, userIds: ['lion'], geo: { country: '中国', province: '广东省', city: '深圳市' }, browser: 'Chrome', os: 'Mac OS X', deviceType: 'Desktop' },
+    { visitorKey: 'uuid-bbbb-2222', tag: null, firstSeen: '2026-09-20T02:00:00.000Z', lastSeen: '2026-09-20T02:30:00.000Z', sessions: 1, pv: 2, userIds: [], geo: { country: '内网', province: '', city: '' }, browser: 'Safari', os: 'iOS', deviceType: 'Mobile' }
+  ]
+}
+
 
 export const devicesFixture: DevicesStats = {
   deviceType: [{ name: 'Desktop', uv: 300, pv: 800 }, { name: 'Mobile', uv: 100, pv: 434 }],
@@ -85,19 +114,25 @@ export const eventsFixture = (offset: number): EventsPage => ({
     browser: 'Chrome',
     os: 'Mac OS X',
     botVerdict: 'none' as const,
+    tag: i === 0 ? { visitorKey: 'fpA', label: '同事', isExcluded: false, note: '', updatedAt: '2026-09-21T01:00:00.000Z' } : null,
     geo: i % 3 === 0 ? { country: '中国', province: '广东省', city: '深圳市' } : i % 3 === 1 ? { country: '内网', province: '', city: '' } : { country: '', province: '', city: '' },
     trackData: { trigger: 'init' }
   }))
 })
 
+export const visitorDetailFixture: VisitorDetail = {
+  profile: { ...visitorsFixture.visitors[1], lifetimeFirstSeen: '2026-09-01T00:00:00.000Z', lifetimeSessions: 5, apps: ['demo', 'blog'] },
+  events: eventsFixture(0).items.slice(0, 3)
+}
+
 const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } })
 
-// 按路径分发的 fetch 桩；未覆盖的路径返回 404
+// 按路径分发的 fetch 桩；统计接口去掉 /v1/stats 前缀，其余接口（如 /v1/visitors/:key/tag）按完整路径匹配；未覆盖的路径返回 404
 export type RouteValue = unknown | ((url: URL) => unknown)
 export const mockStatsFetch = (routes: Record<string, RouteValue>) => {
   return vi.spyOn(window, 'fetch').mockImplementation(async (input) => {
     const url = new URL(String(input), 'http://localhost')
-    const path = url.pathname.replace('/v1/stats', '')
+    const path = url.pathname.startsWith('/v1/stats') ? url.pathname.replace('/v1/stats', '') : url.pathname
     if (path in routes) {
       const value = routes[path]
       return json(typeof value === 'function' ? (value as (u: URL) => unknown)(url) : value)

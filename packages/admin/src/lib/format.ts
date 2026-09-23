@@ -25,6 +25,15 @@ export const formatMetric = (metric: VitalMetric, value: number | null | undefin
   return metric === 'cls' ? value.toFixed(3) : formatMs(value)
 }
 
+// 访问时长（秒）：不足 1 分钟显示秒，否则「分:秒」
+export const formatDuration = (seconds: number): string => {
+  const total = Math.round(seconds)
+  if (total < 60) return `${total}s`
+  const m = Math.floor(total / 60)
+  const s = total % 60
+  return `${m}m ${String(s).padStart(2, '0')}s`
+}
+
 export const shortId = (value: string, keep = 8): string => value.length > keep ? `${value.slice(0, keep)}…` : value
 
 // 地域显示：优先「省 · 市」（直辖市省市同名只显示一次），只有国家（海外/内网）时显示国家，三者皆空为未知

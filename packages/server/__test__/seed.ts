@@ -50,7 +50,7 @@ export const seedEvents = (): TrackEvent[] => {
     ev(B, T0 + DAY + HOUR + 5 * MIN, { trackType: 'Performance', pagePath: '/', trackData: { lcp: 3000, fcp: 2000, cls: 0.3, inp: 600 } }),
     ev(B, T0 + DAY + HOUR + 10 * MIN, { trackType: 'Error', pagePath: '/', trackData: { kind: 'js', name: 'Error', message: 'boom', stack: 'Error: boom\n  at b.js:1' } }),
     ev(B, T0 + DAY + HOUR + 15 * MIN, { trackType: 'Error', pagePath: '/', trackData: { kind: 'promise', name: 'Error', message: 'rejected', stack: '' } }),
-    ev(B2, T0 + 2 * DAY + HOUR, { trackType: 'PageView', pagePath: '/pricing', referrer: 'https://twitter.com/x/status/1', trackData: {} })
+    ev(B2, T0 + 2 * DAY + HOUR, { trackType: 'PageView', pagePath: '/pricing', pageSearch: '?utm_source=wechat&utm_medium=social', referrer: 'https://twitter.com/x/status/1', trackData: {} })
   ]
 }
 
@@ -58,7 +58,7 @@ export const seedEvents = (): TrackEvent[] => {
 export const SEED_IP: Record<string, string> = { uA: '120.24.78.68', uB: '39.156.66.10', uE: '8.8.8.8', uC: '127.0.0.1', uD: '127.0.0.1' }
 
 export const seedDatabase = async (pool: Pool) => {
-  await pool.query('TRUNCATE track_events')
+  await pool.query('TRUNCATE track_events, visitor_tags')
   const events = seedEvents()
   for (const ip of new Set(Object.values(SEED_IP))) {
     const batch = events.filter((event) => SEED_IP[event.uuid] === ip)

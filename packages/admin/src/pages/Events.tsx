@@ -7,7 +7,9 @@ import { formatDateTime } from '../lib/time'
 import { Badge, Card, ErrorState } from '../components/Primitives'
 import { DataTable } from '../components/DataTable'
 import { PageHead, scopeParams } from '../components/PageHead'
+import { visitorHref } from '../state/route'
 import { VERDICT_LABELS } from './Devices'
+import { TagBadge } from './Visitors'
 
 const PAGE_SIZE = 50
 const TYPE_TONE: Record<TrackType, 'default' | 'accent' | 'poor' | 'good' | 'ni'> = {
@@ -77,10 +79,14 @@ export const Events = ({ filters, reloadKey }: PageProps) => {
   )
 }
 
+// 访客列：标签 + userId/访客键缩写，点击进入访客详情（阻止行展开）
 const VisitorCell = ({ row }: { row: EventRow }) => (
-  <span title={`visitor ${row.visitor}\nsession ${row.sessionId}`}>
-    {row.userId ? <strong>{row.userId}</strong> : shortId(row.visitor, 10)}
-    <span className="faint"> · {shortId(row.sessionId, 8)}</span>
+  <span title={`visitor ${row.visitor}\nsession ${row.sessionId}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+    {row.tag && <TagBadge tag={row.tag} />}
+    <a href={visitorHref(row.visitor)} onClick={(e) => { e.stopPropagation(); }}>
+      {row.userId ? <strong>{row.userId}</strong> : shortId(row.visitor, 10)}
+    </a>
+    <span className="faint">· {shortId(row.sessionId, 8)}</span>
   </span>
 )
 

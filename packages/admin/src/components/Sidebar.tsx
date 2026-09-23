@@ -15,7 +15,7 @@ export const Sidebar = ({ active, onLogout }: { active: SectionId, onLogout: () 
       ))}
     </nav>
     <div className="sidebar-foot">
-      <span>UV 口径：canvas 指纹，空指纹回退设备 uuid</span>
+      <span>UV 口径：设备 uuid（同主域 cookie 共享），缺失回退指纹</span>
       <button type="button" className="link-button" onClick={onLogout}>退出登录</button>
     </div>
   </aside>

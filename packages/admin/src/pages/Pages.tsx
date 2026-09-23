@@ -6,11 +6,12 @@ import { Card, ErrorState } from '../components/Primitives'
 import { BarCell, DataTable } from '../components/DataTable'
 import { PageHead, scopeParams } from '../components/PageHead'
 
-export const Pages = ({ filters, reloadKey }: PageProps) => {
+export const Pages = ({ filters, reloadKey, onFilter }: PageProps) => {
   const { data, loading, error } = useStats<PagesStats>(filters.app ? '/pages' : null, { ...scopeParams(filters), limit: 50 }, reloadKey)
   const paths = data?.paths ?? []
   const entries = data?.entries ?? []
   const referrers = data?.referrers ?? []
+  const hosts = data?.hosts ?? []
   const totalPv = paths.reduce((sum, r) => sum + r.pv, 0)
   const totalEntries = entries.reduce((sum, r) => sum + r.sessions, 0)
   const totalRef = referrers.reduce((sum, r) => sum + r.sessions, 0)
@@ -20,11 +21,12 @@ export const Pages = ({ filters, reloadKey }: PageProps) => {
       <PageHead title="页面" filters={filters} />
       {error && <ErrorState message={error} />}
       <div className="grid grid-2-1">
-        <Card title="路径访问排名" hint="按 PV 排序，UV 为该路径的独立访客">
+        <Card title="路径访问排名" hint="按 PV 排序，UV 为该路径的独立访客；点击行按路径下钻">
           <DataTable
             loading={loading}
             rows={paths}
             rowKey={(r) => r.path}
+            onRowClick={(r) => { onFilter({ path: r.path }); }}
             columns={[
               { key: 'path', title: '路径', className: 'mono ellipsis', render: (r) => r.path },
               { key: 'pv', title: 'PV', render: (r) => <BarCell value={r.pv} max={paths[0]?.pv ?? 0} label={formatNumber(r.pv)} /> },
@@ -46,15 +48,28 @@ export const Pages = ({ filters, reloadKey }: PageProps) => {
               ]}
             />
           </Card>
-          <Card title="来源" hint="会话首个页面的 referrer 域名；(direct) 为直接访问">
+          <Card title="来源" hint="会话首个页面的 referrer 域名；(direct) 为直接访问；点击按来源下钻">
             <DataTable
               loading={loading}
               rows={referrers}
               rowKey={(r) => r.host}
+              onRowClick={(r) => { if (r.host !== '(direct)') onFilter({ referrerHost: r.host }) }}
               columns={[
                 { key: 'host', title: '域名', className: 'mono ellipsis', render: (r) => r.host },
                 { key: 'sessions', title: '会话', render: (r) => <BarCell value={r.sessions} max={referrers[0]?.sessions ?? 0} label={formatNumber(r.sessions)} /> },
                 { key: 'share', title: '占比', align: 'right', render: (r) => <span className="muted">{formatPercent(totalRef > 0 ? r.sessions / totalRef : 0)}</span> }
+              ]}
+            />
+          </Card>
+          <Card title="主机名" hint="页面所在 origin，用于区分多域名或多环境部署">
+            <DataTable
+              loading={loading}
+              rows={hosts}
+              rowKey={(r) => r.host}
+              columns={[
+                { key: 'host', title: 'Origin', className: 'mono ellipsis', render: (r) => r.host },
+                { key: 'pv', title: 'PV', render: (r) => <BarCell value={r.pv} max={hosts[0]?.pv ?? 0} label={formatNumber(r.pv)} /> },
+                { key: 'uv', title: 'UV', align: 'right', render: (r) => formatNumber(r.uv) }
               ]}
             />
           </Card>

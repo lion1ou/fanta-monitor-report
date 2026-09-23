@@ -26,13 +26,13 @@ SELECT kind, message, count(*)::int AS count, count(DISTINCT visitor)::int AS us
   min(track_time) AS first_seen, max(track_time) AS last_seen,
   (array_agg(page_path ORDER BY track_time DESC))[1] AS last_path
 FROM (SELECT visitor, track_time, page_path, ${KIND_EXPR} AS kind, ${MESSAGE_EXPR} AS message FROM scoped WHERE track_type = 'Error') e
-GROUP BY kind, message ORDER BY count DESC, last_seen DESC LIMIT $4`
+GROUP BY kind, message ORDER BY count DESC, last_seen DESC LIMIT $5`
 
 const OCCURRENCES_SQL = (scope: Scope) => `
 WITH scoped AS (${scopedSql(scope)})
 SELECT track_id, track_time, page_path, browser, browser_version, os, os_version, COALESCE(user_id, '') AS user_id, visitor, track_data
-FROM scoped WHERE track_type = 'Error' AND ${KIND_EXPR} = $4 AND ${MESSAGE_EXPR} = $5
-ORDER BY track_time DESC LIMIT $6`
+FROM scoped WHERE track_type = 'Error' AND ${KIND_EXPR} = $5 AND ${MESSAGE_EXPR} = $6
+ORDER BY track_time DESC LIMIT $7`
 
 interface GroupRow { kind: string, message: string, count: number, users: number, first_seen: Date, last_seen: Date, last_path: string }
 interface OccurrenceRow {

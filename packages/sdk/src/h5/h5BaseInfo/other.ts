@@ -1,6 +1,4 @@
 import log from '../../common/log';
-import { getLocal, getUUID, setLocal } from '../../common/utils'
-import { UUID_LOCAL_KEY } from '../../common/constant';
 
 interface NetworkInformationLike {
   type?: string
@@ -64,10 +62,3 @@ export const getGeo = async () => {
     log.error('获取定位失败：', error);
   }
 };
-
-export const uuid = () => {
-  const localData = getLocal(UUID_LOCAL_KEY)
-  const id = localData ?? getUUID()
-  setLocal(UUID_LOCAL_KEY, id)
-  return id
-}

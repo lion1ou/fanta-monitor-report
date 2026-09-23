@@ -8,8 +8,11 @@ import { Sidebar } from './components/Sidebar'
 import { FilterBar } from './components/FilterBar'
 import { ErrorState } from './components/Primitives'
 import { Login } from './pages/Login'
+import { Global } from './pages/Global'
 import { Overview } from './pages/Overview'
 import { Pages } from './pages/Pages'
+import { Sources } from './pages/Sources'
+import { Visitors } from './pages/Visitors'
 import { Devices } from './pages/Devices'
 import { Performance } from './pages/Performance'
 import { Errors } from './pages/Errors'
@@ -18,11 +21,18 @@ import { Events } from './pages/Events'
 export interface PageProps {
   filters: Filters
   reloadKey: number
+  // 页面内点击维度值/应用时写回筛选（下钻）
+  onFilter: (patch: Partial<Filters>) => void
+  // 访客详情路由参数（#/visitors/<key>）
+  visitor: string | null
 }
 
 const PAGES: Record<SectionId, ComponentType<PageProps>> = {
+  global: Global,
   overview: Overview,
   pages: Pages,
+  sources: Sources,
+  visitors: Visitors,
   devices: Devices,
   performance: Performance,
   errors: Errors,
@@ -47,15 +57,15 @@ const Shell = () => {
     setReloadKey((k) => k + 1)
   }, [update])
 
-  const Page = PAGES[route]
+  const Page = PAGES[route.section]
   return (
     <div className="app">
-      <Sidebar active={route} onLogout={logout} />
+      <Sidebar active={route.section} onLogout={logout} />
       <div className="main">
-        <FilterBar filters={filters} apps={apps.data?.apps ?? []} onChange={update} onRefresh={refresh} />
+        <FilterBar filters={filters} apps={apps.data?.apps ?? []} showApp={route.section !== 'global'} onChange={update} onRefresh={refresh} />
         <main className="content">
           {apps.error && <ErrorState message={apps.error} onRetry={refresh} />}
-          <Page filters={filters} reloadKey={reloadKey} />
+          <Page filters={filters} reloadKey={reloadKey} onFilter={update} visitor={route.visitor} />
         </main>
       </div>
     </div>

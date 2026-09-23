@@ -1,5 +1,6 @@
 import type { EventContext, InitParams, SdkConfig } from '../types'
-import { getBaseInfo, generateUuid, getGeoInfo, getNetwork, getFingerPrint } from '../h5/h5BaseInfo'
+import { getBaseInfo, getGeoInfo, getNetwork, getFingerPrint } from '../h5/h5BaseInfo'
+import { resolveVisitorId } from './visitorId'
 import log from './log'
 
 const DEFAULT_CONFIG: SdkConfig = {
@@ -66,7 +67,7 @@ const Store = {
       appName: this.config.appName,
       appVersion: this.config.appVersion,
       userId: this.config.userId,
-      uuid: generateUuid(),
+      uuid: resolveVisitorId(this.config.cookieDomain),
       sdkVersion: sdk.version,
       sdkEnv: sdk.env
     }

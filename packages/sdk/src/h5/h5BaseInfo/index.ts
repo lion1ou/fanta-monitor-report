@@ -1,5 +1,5 @@
 import { getBrower, getOS, getDeviceType, getBrowerEngine, getOrientation, getScreenInfo, getMobileModel } from './device'
-import { getNetworkType, getGeo, uuid } from './other'
+import { getNetworkType, getGeo } from './other'
 import type { DeviceInfo } from '../../types'
 import log from '../../common/log'
 import fingerprinting from './fingerprint'
@@ -31,8 +31,6 @@ export const getFingerPrint = (): { fingerPrint: string, fingerPrintCanvas: stri
     return { fingerPrintCanvas: '', fingerPrint: '' }
   }
 }
-
-export const generateUuid = (): string => uuid()
 
 // 经纬度，逗号分隔 `经度,纬度`；获取失败返回空字符串
 export const getGeoInfo = async (): Promise<string> => {
