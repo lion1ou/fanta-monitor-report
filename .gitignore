@@ -1,3 +1,7 @@
 node_modules
 .DS_Store
 dist
+.env
+coverage
+# IP 地域库数据文件（npm run geo:download 生成）
+packages/server/data/

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fanta Report Example</title>
+    <script src="./fanta-report.umd.js"></script>
+    <script>
+      window.FantaReport.initReport({
+        reportHost: 'http://localhost:5001/v1/track',
+        appName: 'fantaTestPage',
+        appVersion: '0.1.0',
+        debug: true,
+        batchSize: 3,
+        flushInterval: 2000
+      });
+    </script>
+    <style>
+      body { font-family: system-ui, sans-serif; padding: 24px; }
+      button { display: block; margin: 8px 0; padding: 8px 16px; }
+    </style>
+  </head>
+  <body>
+    <h1>打开开发者工具查看控制台与网络请求</h1>
+    <button id="btn-click" onclick="FantaReport.click({ button: 'btn-click' })">上报 Click</button>
+    <button id="btn-route" onclick="history.pushState({}, '', '/page-' + Date.now())">SPA 路由切换（自动 PV）</button>
+    <button id="btn-error" onclick="setTimeout(() => { throw new Error('example error') }, 0)">触发 JS 错误（自动 Error）</button>
+    <button id="btn-custom" onclick="FantaReport.custom({ scene: 'demo' })">上报 Custom</button>
+    <button id="btn-flush" onclick="FantaReport.flush()">立即发送</button>
+  </body>
+</html>

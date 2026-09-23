@@ -18,7 +18,9 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
+    project: ['./packages/*/tsconfig.json'],
+    tsconfigRootDir: __dirname
   },
   rules: {
     '@typescript-eslint/explicit-function-return-type': 0,

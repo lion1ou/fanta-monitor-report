@@ -1,59 +1,34 @@
 {
-  "name": "fanta-monitor-report",
-  "version": "0.0.3",
-  "description": "fanta is a frontend monitor report sdk",
-  "main": "dist/bundle.js",
-  "module": "dist/bundle.es.js",
-  "umd": "dist/bundle.umd.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_ENV='pro' rollup -c",
-    "dev": "NODE_ENV='dev' rollup -c -w",
-    "lint": "eslint --ext .ts src --fix"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lion1ou/fanta-monitor-report.git"
-  },
-  "keywords": [
-    "frontend",
-    "monitor",
-    "report",
-    "前端",
-    "监控",
-    "上报"
-  ],
-  "author": "lion1ou",
+  "name": "fanta-monitor",
+  "private": true,
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/lion1ou/fanta-monitor-report/issues"
-  },
-  "homepage": "https://github.com/lion1ou/fanta-monitor-report#readme",
-  "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.22.15",
-    "@babel/preset-env": "^7.22.20",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^25.0.4",
-    "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.2.1",
-    "@rollup/plugin-replace": "^5.0.5",
-    "@rollup/plugin-terser": "^0.4.3",
-    "@types/blueimp-md5": "^2.18.2",
-    "@typescript-eslint/eslint-plugin": "^6.4.0",
-    "eslint": "^8.0.1",
-    "eslint-config-standard-with-typescript": "^39.1.0",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
-    "eslint-plugin-promise": "^6.0.0",
-    "pre-commit": "^1.2.2",
-    "rollup": "^3.29.3",
-    "rollup-plugin-generate-html-template": "^1.7.0",
-    "rollup-plugin-serve": "^2.0.2",
-    "rollup-plugin-typescript2": "^0.35.0",
-    "typescript": "^5.2.2"
+  "workspaces": [
+    "packages/shared",
+    "packages/sdk",
+    "packages/server",
+    "packages/admin"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint --ext .ts,.tsx packages/shared/src packages/sdk/src packages/server/src packages/admin/src --fix",
+    "dev:sdk": "npm run build -w packages/shared && npm run dev -w packages/sdk",
+    "dev:server": "npm run build -w packages/shared && npm run dev -w packages/server",
+    "dev:admin": "npm run build -w packages/shared && npm run dev -w packages/admin",
+    "migrate": "npm run migrate -w packages/server --",
+    "deploy": "sh deploy.sh"
   },
   "precommit": "lint",
-  "dependencies": {
-    "blueimp-md5": "^2.19.0"
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-standard-with-typescript": "^39.1.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.6.0",
+    "jsdom": "^29.1.1",
+    "pre-commit": "^2.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.1"
   }
 }
