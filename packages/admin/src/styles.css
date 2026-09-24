@@ -125,6 +125,7 @@ table.data td { padding: 0 8px; height: 36px; border-bottom: 1px solid var(--bor
 table.data tr:last-child td { border-bottom: 0; }
 table.data th.num, table.data td.num { text-align: right; }
 table.data td.ellipsis { max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+table.data td.ua-full { min-width: 420px; height: auto; padding-top: 10px; padding-bottom: 10px; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
 table.data tr.clickable { cursor: pointer; }
 table.data tr.clickable:hover td { background: oklch(97.5% 0 0); }
 table.data tr.expanded td { background: var(--accent-soft); }

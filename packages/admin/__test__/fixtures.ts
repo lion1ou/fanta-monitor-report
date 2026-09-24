@@ -67,6 +67,17 @@ export const devicesFixture: DevicesStats = {
     province: [{ name: '广东省', uv: 200, pv: 700 }, { name: '北京市', uv: 180, pv: 500 }, { name: 'California', uv: 20, pv: 34 }],
     city: [{ name: '深圳市', uv: 200, pv: 700 }, { name: '北京市', uv: 180, pv: 500 }]
   },
+  userAgents: [
+    {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1',
+      category: 'browser',
+      browser: 'Safari',
+      os: 'iOS',
+      deviceType: 'Mobile',
+      uv: 100,
+      pv: 434
+    }
+  ],
   bots: { realUv: 400, realPv: 1234, botUv: 3, botPv: 2, verdicts: [{ verdict: 'ua', pv: 2 }], agents: [{ name: 'Googlebot/2.1', pv: 2 }] }
 }
 

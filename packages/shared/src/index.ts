@@ -150,6 +150,19 @@ export interface GeoRegion {
 
 export const GEO_INTERNAL = '内网'
 
+export const USER_AGENT_CATEGORIES = ['bot', 'webview', 'script', 'browser', 'other'] as const
+export type UserAgentCategory = (typeof USER_AGENT_CATEGORIES)[number]
+
+export interface UserAgentSummary {
+  userAgent: string
+  category: UserAgentCategory
+  browser: string
+  os: string
+  deviceType: string
+  uv: number
+  pv: number
+}
+
 export interface DevicesStats {
   deviceType: Distribution[]
   os: Distribution[]
@@ -158,6 +171,7 @@ export interface DevicesStats {
   network: Distribution[]
   language: Distribution[]
   geo: Record<keyof GeoRegion, Distribution[]>
+  userAgents: UserAgentSummary[]
   bots: {
     realUv: number
     realPv: number

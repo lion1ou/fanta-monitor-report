@@ -189,6 +189,26 @@ describe('GET /v1/stats/devices', () => {
       verdicts: [{ verdict: 'ua', pv: 2 }, { verdict: 'webdriver', pv: 1 }],
       agents: [{ name: GOOGLEBOT_UA, pv: 2 }, { name: CHROME_UA, pv: 1 }]
     })
+    expect(body.userAgents).toEqual([
+      {
+        userAgent: CHROME_UA,
+        category: 'browser',
+        browser: 'Chrome',
+        os: 'Mac OS X',
+        deviceType: 'Desktop',
+        uv: 2,
+        pv: 3
+      },
+      {
+        userAgent: expect.stringContaining('iPhone OS 17_0'),
+        category: 'browser',
+        browser: 'Safari',
+        os: 'iOS',
+        deviceType: 'Mobile',
+        uv: 1,
+        pv: 2
+      }
+    ])
   })
 
   it('地域三级分布；省/市为空时回退到上一级名称', async () => {

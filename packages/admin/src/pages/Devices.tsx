@@ -1,8 +1,8 @@
-import type { BotVerdict, DevicesStats, DimensionKey, GeoRegion } from '@fanta/shared'
+import type { BotVerdict, DevicesStats, DimensionKey, GeoRegion, UserAgentCategory } from '@fanta/shared'
 import type { PageProps } from '../App'
 import { useStats } from '../hooks/useStats'
 import { formatNumber, formatPercent } from '../lib/format'
-import { Card, Empty, ErrorState, Skeleton } from '../components/Primitives'
+import { Badge, Card, Empty, ErrorState, Skeleton } from '../components/Primitives'
 import { DistributionList } from '../components/DistributionList'
 import { DataTable } from '../components/DataTable'
 import { PageHead, scopeParams } from '../components/PageHead'
@@ -15,7 +15,7 @@ const GEO_LEVELS: Array<{ key: keyof GeoRegion, title: string }> = [
 ]
 
 // filterKey 为空的维度不支持下钻（服务端没有对应过滤表达式）
-const DIMENSIONS: Array<{ key: keyof Omit<DevicesStats, 'bots' | 'geo'>, title: string, filterKey: DimensionKey | null }> = [
+const DIMENSIONS: Array<{ key: keyof Omit<DevicesStats, 'bots' | 'geo' | 'userAgents'>, title: string, filterKey: DimensionKey | null }> = [
   { key: 'deviceType', title: '设备类型', filterKey: 'deviceType' },
   { key: 'os', title: '操作系统', filterKey: 'os' },
   { key: 'browser', title: '浏览器', filterKey: 'browser' },
@@ -31,6 +31,14 @@ export const VERDICT_LABELS: Record<BotVerdict, string> = {
   none: '真实访客'
 }
 
+const UA_CATEGORY: Record<UserAgentCategory, { label: string, tone: 'default' | 'accent' | 'poor' | 'good' | 'ni' }> = {
+  bot: { label: '爬虫/自动化', tone: 'poor' },
+  webview: { label: '内嵌 WebView', tone: 'accent' },
+  script: { label: '脚本/API 客户端', tone: 'ni' },
+  browser: { label: '普通浏览器', tone: 'good' },
+  other: { label: '其他', tone: 'default' }
+}
+
 export const Devices = ({ filters, reloadKey, onFilter }: PageProps) => {
   const { data, loading, error } = useStats<DevicesStats>(filters.app ? '/devices' : null, scopeParams(filters), reloadKey)
   return (
@@ -38,6 +46,22 @@ export const Devices = ({ filters, reloadKey, onFilter }: PageProps) => {
       <PageHead title="设备与地域" filters={filters} />
       {error && <ErrorState message={error} />}
       <BotsPanel bots={data?.bots} loading={loading} />
+      <Card title="User-Agent 明细" hint="当前筛选范围内按 PV 排序的前 50 个唯一 UA；完整文本自动换行" ariaLabel="User-Agent 明细">
+        <DataTable
+          loading={loading}
+          rows={data?.userAgents ?? []}
+          rowKey={(row) => row.userAgent}
+          columns={[
+            { key: 'category', title: '分类', render: (row) => <Badge tone={UA_CATEGORY[row.category].tone}>{UA_CATEGORY[row.category].label}</Badge> },
+            { key: 'ua', title: '完整 User-Agent', className: 'mono ua-full', render: (row) => row.userAgent },
+            { key: 'browser', title: '浏览器', render: (row) => row.browser || <span className="faint">—</span> },
+            { key: 'os', title: '操作系统', render: (row) => row.os || <span className="faint">—</span> },
+            { key: 'device', title: '设备', render: (row) => row.deviceType || <span className="faint">—</span> },
+            { key: 'uv', title: 'UV', align: 'right', render: (row) => formatNumber(row.uv) },
+            { key: 'pv', title: 'PV', align: 'right', render: (row) => formatNumber(row.pv) }
+          ]}
+        />
+      </Card>
       <div className="grid grid-3">
         {GEO_LEVELS.map((level) => (
           <Card key={level.key} title={level.title} hint="按访问 IP 解析，内网与未知单列；点击下钻" ariaLabel={level.title}>

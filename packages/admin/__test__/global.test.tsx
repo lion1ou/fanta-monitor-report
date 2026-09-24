@@ -106,6 +106,17 @@ describe('下钻', () => {
     expect(within(screen.getByRole('region', { name: '屏幕分辨率' })).queryByRole('button')).toBeNull()
   })
 
+  it('设备页完整展示 UA、基础分类与客户端信息', async () => {
+    mockStatsFetch({ '/devices': devicesFixture })
+    render(<Devices filters={filtersFixture} {...pageProps} />)
+    const panel = await screen.findByRole('region', { name: 'User-Agent 明细' })
+    expect(within(panel).getByText('普通浏览器')).toBeInTheDocument()
+    expect(within(panel).getByText(devicesFixture.userAgents[0].userAgent)).toBeInTheDocument()
+    expect(within(panel).getByText('Safari')).toBeInTheDocument()
+    expect(within(panel).getByText('iOS')).toBeInTheDocument()
+    expect(within(panel).getByText('Mobile')).toBeInTheDocument()
+  })
+
   it('页面表点击路径写入 path，并渲染主机名表', async () => {
     const onFilter = vi.fn()
     mockStatsFetch({ '/pages': pagesFixture })
